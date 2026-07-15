@@ -1354,8 +1354,10 @@ function InteriorRig() {
       const dx = e.clientX - lastPointer.current.x;
       const dy = e.clientY - lastPointer.current.y;
       lastPointer.current = { x: e.clientX, y: e.clientY };
-      yaw.current += dx * 0.004;
-      pitch.current = THREE.MathUtils.clamp(pitch.current - dy * 0.003, -0.7, 0.7);
+      // thumbs travel far fewer px than a mouse — higher gain on touch
+      const gain = e.pointerType === "touch" ? 0.0068 : 0.004;
+      yaw.current += dx * gain;
+      pitch.current = THREE.MathUtils.clamp(pitch.current - dy * gain * 0.75, -0.7, 0.7);
     };
     const onUp = (e: PointerEvent) => {
       if (e.pointerId === lookPointer.current) lookPointer.current = null;

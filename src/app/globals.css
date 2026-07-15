@@ -112,6 +112,17 @@ body {
   color: #ffd9a0;
 }
 
+/* Compact HUD controls on phone widths — one tidy row, still ≥40px tall
+   for comfortable tapping */
+@media (max-width: 640px) {
+  .hud-btn {
+    padding: 0.5rem 0.68rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.09em;
+    gap: 0.3rem;
+  }
+}
+
 /* Focus visibility for keyboard users */
 a:focus-visible,
 button:focus-visible {

@@ -54,17 +54,20 @@ export default function Hud() {
 
   return (
     <>
-      {/* top-left: identity + current zone (hidden on phone-width landing —
-          the hero title already carries the name and the space is needed by
-          the Map/Recruiter buttons) */}
-      <div className={`pointer-events-none fixed left-4 top-4 z-30 select-none ${mode !== "interior" ? "hidden md:block" : ""}`}>
-        <div className="font-mono text-[0.68rem] uppercase tracking-[0.3em] text-alu-400">
+      {/* top-left: identity + current zone. On phones the name is dropped
+          (the hero / zone chip carries identity) so the top bar never wraps
+          into the buttons. */}
+      <div
+        className="pointer-events-none fixed left-4 z-30 select-none"
+        style={{ top: "max(1rem, env(safe-area-inset-top))" }}
+      >
+        <div className="hidden font-mono text-[0.68rem] uppercase tracking-[0.3em] text-alu-400 sm:block">
           {personal.name}
         </div>
         {mode === "interior" && (
-          <div className="mt-1 flex items-center gap-2">
+          <div className="mt-0 flex items-center gap-2 sm:mt-1">
             <span className="beacon inline-block h-1.5 w-1.5 rounded-full bg-amber-av" aria-hidden />
-            <span className="font-mono text-xs uppercase tracking-[0.2em] text-sky-accent">
+            <span className="max-w-[38vw] truncate font-mono text-xs uppercase tracking-[0.2em] text-sky-accent sm:max-w-none">
               {section.zoneName}
               {/* the tagline needs more width than a phone has next to the buttons */}
               <span className="hidden md:inline"> — {section.tagline}</span>
@@ -73,18 +76,32 @@ export default function Hud() {
         )}
       </div>
 
-      {/* top-right: primary controls */}
-      <div className="fixed right-4 top-4 z-30 flex flex-wrap justify-end gap-2">
+      {/* top-right: primary controls — icon-compact on phones so they sit in
+          one row without colliding with the zone chip */}
+      <div
+        className="fixed right-3 z-30 flex justify-end gap-1.5 sm:right-4 sm:gap-2"
+        style={{ top: "max(0.75rem, env(safe-area-inset-top))" }}
+      >
         {mode === "interior" && (
-          <button type="button" className="hud-btn" onClick={() => { uiClick(soundOn); exitToExterior(); }}>
-            ⤴ Exterior
+          <button
+            type="button"
+            className="hud-btn"
+            onClick={() => { uiClick(soundOn); exitToExterior(); }}
+            aria-label="Return to exterior view"
+          >
+            ⤴<span className="hidden sm:inline"> Exterior</span>
           </button>
         )}
-        <button type="button" className="hud-btn" onClick={() => { uiClick(soundOn); toggleMap(); }}>
-          ▦ Map
+        <button
+          type="button"
+          className="hud-btn"
+          onClick={() => { uiClick(soundOn); toggleMap(); }}
+          aria-label="Open aircraft map"
+        >
+          ▦<span className="hidden sm:inline"> Map</span>
         </button>
         <Link href="/recruiter" className="hud-btn hud-btn--amber">
-          ★ Recruiter Mode
+          ★ Recruiter<span className="hidden sm:inline"> Mode</span>
         </Link>
       </div>
 
@@ -112,7 +129,7 @@ export default function Hud() {
           devices the joystick owns this corner, and Contact stays reachable
           via the map + comms zone) */}
       {mode === "interior" && !isTouch && (
-        <div className="fixed bottom-4 left-4 z-30 flex gap-2">
+        <div className="fixed bottom-4 left-4 z-30 hidden gap-2 sm:flex">
           <button type="button" className="hud-btn" onClick={() => setPanel("comms")}>
             ✉ Contact
           </button>

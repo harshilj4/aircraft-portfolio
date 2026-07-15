@@ -24,15 +24,16 @@ export function useIsTouch(): boolean {
 
 /**
  * Rough GPU/device capability check used to pick a default quality level.
- * Touch devices never default to "high" — phone GPUs pay a much higher price
- * for the rain/cloud density and 2× DPR than laptops do.
+ * Touch devices always start at "balanced": they render at near-native DPR
+ * with thinned particle counts, and the in-canvas FPS monitor steps weak
+ * phones down automatically — that beats guessing from core counts, which
+ * Safari deliberately misreports.
  */
 export function detectDefaultQuality(): "high" | "balanced" | "performance" {
   if (typeof window === "undefined") return "balanced";
+  if (window.matchMedia("(pointer: coarse)").matches) return "balanced";
   const cores = navigator.hardwareConcurrency ?? 4;
   const mem = (navigator as unknown as { deviceMemory?: number }).deviceMemory ?? 4;
-  const coarse = window.matchMedia("(pointer: coarse)").matches;
-  if (coarse) return cores >= 6 ? "balanced" : "performance";
   if (cores >= 8 && mem >= 8) return "high";
   if (cores <= 4 || mem <= 4) return "performance";
   return "balanced";

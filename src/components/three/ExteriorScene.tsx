@@ -12,6 +12,10 @@ import { useAppStore } from "@/stores/useAppStore";
  * live lightning (jagged bolts + global flashes). Everything procedural.
  */
 
+/** Touch devices trade particle density for native-resolution rendering. */
+const IS_COARSE =
+  typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+
 const BOARD_X: Record<string, number> = {
   cockpit: -25.5,
   projects: -13,
@@ -59,7 +63,9 @@ function StormClouds() {
   const puffs = useMemo<Puff[]>(() => {
     const rng = (a: number, b: number) => a + Math.random() * (b - a);
     const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
-    const n = quality === "high" ? 60 : quality === "balanced" ? 40 : 18;
+    const base = quality === "high" ? 60 : quality === "balanced" ? 40 : 18;
+    // cloud sprites are pure overdraw — the thing phone GPUs choke on
+    const n = Math.round(base * (IS_COARSE ? 0.55 : 1));
     const list: Puff[] = [];
     // heavy storm deck below
     for (let i = 0; i < n; i++) {
@@ -119,7 +125,7 @@ function StormClouds() {
 function Rain() {
   const quality = useAppStore((s) => s.quality);
   const reducedMotion = useAppStore((s) => s.reducedMotion);
-  const count = quality === "high" ? 750 : 450;
+  const count = Math.round((quality === "high" ? 750 : 450) * (IS_COARSE ? 0.6 : 1));
   const geomRef = useRef<THREE.BufferGeometry>(null!);
 
   const data = useMemo(() => {

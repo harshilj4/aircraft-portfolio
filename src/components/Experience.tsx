@@ -4,7 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
 import { useAppStore } from "@/stores/useAppStore";
-import { detectDefaultQuality } from "@/hooks/useIsMobile";
+import { detectDefaultQuality, useIsTouch } from "@/hooks/useIsMobile";
 import ExteriorScene from "./three/ExteriorScene";
 import CabinScene from "./three/CabinScene";
 import Hud from "./ui/Hud";
@@ -24,6 +24,7 @@ import TouchControls from "./ui/TouchControls";
 export default function Experience() {
   const mode = useAppStore((s) => s.mode);
   const quality = useAppStore((s) => s.quality);
+  const isTouch = useIsTouch();
   const setQuality = useAppStore((s) => s.setQuality);
   const setReducedMotion = useAppStore((s) => s.setReducedMotion);
   const enterInterior = useAppStore((s) => s.enterInterior);
@@ -72,18 +73,33 @@ export default function Experience() {
     return () => timers.current.forEach(clearTimeout);
   }, [mode, enterInterior, reducedMotion]);
 
-  const dpr: [number, number] =
-    quality === "high" ? [1, 2] : quality === "balanced" ? [1, 1.5] : [0.8, 1];
+  // Phones pack ~3 device pixels per CSS pixel — rendering below ~2× there
+  // looks smeared, so touch devices get near-native resolution and the scene
+  // is thinned elsewhere (cloud/rain counts) instead. Desktop keeps the
+  // original quality→resolution ladder.
+  const deviceDpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+  const dpr: [number, number] = isTouch
+    ? quality === "performance"
+      ? [1, Math.min(1.8, deviceDpr)]
+      : [1, Math.min(2.5, deviceDpr)]
+    : quality === "high"
+      ? [1, 2]
+      : quality === "balanced"
+        ? [1, 1.5]
+        : [0.8, 1];
+  // MSAA is nearly free on mobile tile GPUs and jaggies are what read as
+  // "bad graphics" — keep it on for touch at every quality level
+  const antialias = isTouch || quality !== "performance";
 
   return (
     <div className="fixed inset-0">
       {/* key={quality} rebuilds the renderer so quality changes apply instantly
           (resolution, antialiasing, cloud/rain density, light counts) */}
       <Canvas
-        key={quality}
+        key={`${quality}-${isTouch ? "t" : "d"}`}
         dpr={dpr}
         camera={{ position: [26, 8, 46], fov: 50, near: 0.1, far: 1500 }}
-        gl={{ antialias: quality !== "performance", powerPreference: "high-performance" }}
+        gl={{ antialias, powerPreference: "high-performance" }}
       >
         <PerformanceMonitor iterations={10} threshold={0.7} onDecline={stepQualityDown}>
           <Suspense fallback={null}>

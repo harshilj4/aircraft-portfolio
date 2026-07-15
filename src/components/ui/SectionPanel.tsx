@@ -30,7 +30,7 @@ export default function SectionPanel() {
           animate={{ x: 0 }}
           exit={{ x: "105%" }}
           transition={{ type: "tween", duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="glass-panel fixed right-3 top-3 bottom-3 z-40 flex w-[min(560px,94vw)] flex-col overflow-hidden rounded-xl"
+          className="glass-panel fixed inset-2 z-40 flex w-auto flex-col overflow-hidden rounded-xl sm:inset-auto sm:right-3 sm:top-3 sm:bottom-3 sm:w-[min(560px,94vw)]"
           role="dialog"
           aria-label={`${section.zoneName} — ${section.name}`}
         >

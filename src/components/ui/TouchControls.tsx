@@ -6,7 +6,7 @@ import { useIsTouch } from "@/hooks/useIsMobile";
 import { touchMove, resetTouchMove } from "@/lib/touchControls";
 
 /** Max knob travel from the stick centre, in px. */
-const TRAVEL = 42;
+const TRAVEL = 38;
 
 /**
  * On-screen analog joystick for touch devices — walk the cabin with the left
@@ -54,7 +54,7 @@ export default function TouchControls() {
   return (
     <div
       ref={baseRef}
-      className="fixed bottom-6 left-5 z-30 flex h-32 w-32 touch-none select-none items-center justify-center rounded-full border border-alu-500/25 bg-graphite-950/45 backdrop-blur-sm"
+      className="fixed bottom-6 left-5 z-30 flex h-28 w-28 touch-none select-none items-center justify-center rounded-full border border-alu-500/25 bg-graphite-950/45 backdrop-blur-sm"
       style={{ bottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
       role="application"
       aria-label="Movement joystick — drag to walk through the cabin"
@@ -81,7 +81,7 @@ export default function TouchControls() {
       <div
         ref={knobRef}
         aria-hidden
-        className="h-14 w-14 rounded-full border border-sky-accent/50 bg-sky-accent/25 shadow-[0_0_18px_rgba(157,140,255,0.35)]"
+        className="h-12 w-12 rounded-full border border-sky-accent/50 bg-sky-accent/25 shadow-[0_0_18px_rgba(157,140,255,0.35)]"
       />
     </div>
   );
