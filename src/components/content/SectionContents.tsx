@@ -28,7 +28,7 @@ export function ResumeAction({ large = false }: { large?: boolean }) {
       <a
         href={siteConfig.resume.url}
         download
-        className={`hud-btn hud-btn--amber ${large ? "px-6 py-3 text-sm" : ""}`}
+        className={`btn btn--navy ${large ? "px-6 py-3 text-sm" : ""}`}
       >
         ⬇ {siteConfig.resume.label}
       </a>
@@ -36,7 +36,7 @@ export function ResumeAction({ large = false }: { large?: boolean }) {
   }
   // Resume PDF not uploaded yet — offer a contact CTA instead of a dead button.
   return (
-    <a href={getMailto("Resume request — via portfolio")} className={`hud-btn ${large ? "px-6 py-3 text-sm" : ""}`}>
+    <a href={getMailto("Resume request — via portfolio")} className={`btn ${large ? "px-6 py-3 text-sm" : ""}`}>
       ✉ Request Resume by Email
     </a>
   );
@@ -47,8 +47,8 @@ export function ResumeAction({ large = false }: { large?: boolean }) {
 export function AboutContent() {
   return (
     <div className="space-y-6">
-      <p className="text-sm leading-relaxed text-sky-accent/90 font-mono">{personal.welcome}</p>
-      <div className="space-y-3 text-sm leading-relaxed text-alu-200">
+      <p className="text-sm leading-relaxed text-signal/90 font-mono">{personal.welcome}</p>
+      <div className="space-y-3 text-sm leading-relaxed text-ink-800">
         {personal.aboutFull.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
@@ -63,20 +63,20 @@ export function AboutContent() {
           ["Secondary interest", personal.interests.secondary],
           ["Current mission", personal.mission],
         ].map(([k, v]) => (
-          <div key={k} className="rounded-lg border border-alu-500/20 bg-graphite-800/70 p-3">
-            <div className="tech-label mb-1">{k}</div>
-            <div className="text-sm text-alu-100">{v}</div>
+          <div key={k} className="rounded-lg border border-paper-400/20 bg-paper-200/70 p-3">
+            <div className="label mb-1">{k}</div>
+            <div className="text-sm text-ink-900">{v}</div>
           </div>
         ))}
       </div>
 
       <div>
-        <h4 className="tech-label mb-2">Engineering philosophy</h4>
-        <p className="mb-3 text-sm leading-relaxed text-alu-200">{personal.philosophy.main}</p>
+        <h4 className="label mb-2">Engineering philosophy</h4>
+        <p className="mb-3 text-sm leading-relaxed text-ink-800">{personal.philosophy.main}</p>
         <ul className="space-y-1.5">
           {personal.philosophy.principles.map((p) => (
-            <li key={p} className="flex gap-2 text-sm text-alu-300">
-              <span className="text-amber-av" aria-hidden>▸</span>
+            <li key={p} className="flex gap-2 text-sm text-ink-600">
+              <span className="text-caution" aria-hidden>▸</span>
               {p}
             </li>
           ))}
@@ -84,10 +84,10 @@ export function AboutContent() {
       </div>
 
       <div>
-        <h4 className="tech-label mb-2">Areas of interest</h4>
+        <h4 className="label mb-2">Areas of interest</h4>
         <div className="flex flex-wrap gap-2">
           {personal.interests.areas.map((a) => (
-            <span key={a} className="rounded border border-sky-dim/40 bg-navy-900/60 px-2.5 py-1 text-xs text-alu-200">
+            <span key={a} className="rounded border border-signal/40 bg-paper-200/60 px-2.5 py-1 text-xs text-ink-800">
               {a}
             </span>
           ))}
@@ -104,16 +104,16 @@ export function ProjectCard({ project, onOpen }: { project: Project; onOpen: () 
     <button
       type="button"
       onClick={onOpen}
-      className="group w-full rounded-lg border border-alu-500/20 bg-graphite-800/70 p-4 text-left transition hover:border-sky-accent/60 hover:bg-graphite-700/70"
+      className="group w-full rounded-lg border border-paper-400/20 bg-paper-200/70 p-4 text-left transition hover:border-signal/60 hover:bg-paper-300/70"
     >
       <div className="mb-1 flex items-center gap-2">
         <span className="h-2 w-2 rounded-full" style={{ background: project.accent }} aria-hidden />
-        <span className="tech-label">{project.category[0]}</span>
-        <span className="ml-auto font-mono text-[0.6rem] uppercase tracking-widest text-alu-500">{project.status}</span>
+        <span className="label">{project.category[0]}</span>
+        <span className="ml-auto font-mono text-[0.6rem] uppercase tracking-widest text-paper-400">{project.status}</span>
       </div>
-      <div className="font-semibold text-alu-100 group-hover:text-white">{project.title}</div>
-      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-alu-400">{project.summary}</p>
-      <div className="mt-2 font-mono text-[0.65rem] uppercase tracking-widest text-sky-accent opacity-0 transition group-hover:opacity-100">
+      <div className="font-semibold text-ink-900 group-hover:text-signal">{project.title}</div>
+      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-ink-400">{project.summary}</p>
+      <div className="mt-2 font-mono text-[0.65rem] uppercase tracking-widest text-signal opacity-0 transition group-hover:opacity-100">
         Open exhibit ▸
       </div>
     </button>
@@ -134,7 +134,7 @@ export function ProjectsContent({
         <button
           type="button"
           onClick={() => setProject(null)}
-          className="mb-4 font-mono text-xs uppercase tracking-widest text-sky-accent hover:text-white"
+          className="mb-4 font-mono text-xs uppercase tracking-widest text-signal hover:text-signal-deep"
         >
           ← All exhibits
         </button>
@@ -144,7 +144,7 @@ export function ProjectsContent({
   }
   return (
     <div className="space-y-3">
-      <p className="text-sm text-alu-300">
+      <p className="text-sm text-ink-600">
         Each exhibit documents a real build — problem, process, hardware, testing and lessons learned.
       </p>
       {projects.map((p) => (
@@ -161,25 +161,25 @@ export function ResearchContent() {
   return (
     <div className="space-y-6">
       <div className="rounded-lg border border-[#c084fc]/30 bg-[#c084fc]/5 p-4">
-        <div className="tech-label mb-1" style={{ color: "#c084fc" }}>
+        <div className="label mb-1" style={{ color: "#c084fc" }}>
           Research Assistant — York University, Lassonde School of Engineering
         </div>
-        <p className="text-sm text-alu-200">
+        <p className="text-sm text-ink-800">
           Laser-induced graphene (LIG) sensors, with a focus on humidity sensing.
         </p>
       </div>
       <ProjectDetail project={lig} />
       <div>
-        <h4 className="tech-label mb-2">Experimental variables considered</h4>
+        <h4 className="label mb-2">Experimental variables considered</h4>
         <div className="flex flex-wrap gap-2">
           {["Laser power", "Laser speed", "Fill method (line / dot)", "Line spacing", "Focus height", "Number of passes", "Substrate material"].map((v) => (
-            <span key={v} className="rounded border border-[#c084fc]/30 bg-graphite-800/70 px-2.5 py-1 text-xs text-alu-200">
+            <span key={v} className="rounded border border-[#c084fc]/30 bg-paper-200/70 px-2.5 py-1 text-xs text-ink-800">
               {v}
             </span>
           ))}
         </div>
       </div>
-      <p className="text-xs leading-relaxed text-alu-500">
+      <p className="text-xs leading-relaxed text-paper-400">
         Performance values (sensitivity, response/recovery time, operating range) are studied from
         published literature and are not presented here as results of my own experiments.
       </p>
@@ -194,22 +194,22 @@ export function BriefingContent() {
     <div className="space-y-7">
       <div className="flex flex-wrap items-center gap-3">
         <ResumeAction large />
-        <a href={links.linkedin} target="_blank" rel="noopener noreferrer" className="hud-btn">
+        <a href={links.linkedin} target="_blank" rel="noopener noreferrer" className="btn">
           LinkedIn ↗
         </a>
       </div>
 
       <div>
-        <h4 className="tech-label mb-3">Research experience</h4>
+        <h4 className="label mb-3">Research experience</h4>
         {researchExperience.map((e) => (
-          <div key={e.title} className="rounded-lg border border-alu-500/20 bg-graphite-800/70 p-4">
-            <div className="font-semibold text-white">{e.title}</div>
-            <div className="text-sm text-sky-accent">{e.organization}</div>
-            {e.focus && <p className="mt-1 text-sm text-alu-300">{e.focus}</p>}
+          <div key={e.title} className="rounded-lg border border-paper-400/20 bg-paper-200/70 p-4">
+            <div className="font-semibold text-ink-900">{e.title}</div>
+            <div className="text-sm text-signal">{e.organization}</div>
+            {e.focus && <p className="mt-1 text-sm text-ink-600">{e.focus}</p>}
             <ul className="mt-2 space-y-1">
               {e.responsibilities.map((r) => (
-                <li key={r} className="flex gap-2 text-sm text-alu-300">
-                  <span className="text-sky-accent" aria-hidden>▸</span>
+                <li key={r} className="flex gap-2 text-sm text-ink-600">
+                  <span className="text-signal" aria-hidden>▸</span>
                   {r}
                 </li>
               ))}
@@ -219,23 +219,23 @@ export function BriefingContent() {
       </div>
 
       <div>
-        <h4 className="tech-label mb-3">Work experience</h4>
+        <h4 className="label mb-3">Work experience</h4>
         <div className="space-y-3">
           {workExperience.map((e) => (
-            <div key={e.title + e.organization} className="rounded-lg border border-alu-500/20 bg-graphite-800/70 p-4">
-              <div className="font-semibold text-alu-100">{e.title}</div>
-              <div className="text-sm text-alu-400">{e.organization}</div>
+            <div key={e.title + e.organization} className="rounded-lg border border-paper-400/20 bg-paper-200/70 p-4">
+              <div className="font-semibold text-ink-900">{e.title}</div>
+              <div className="text-sm text-ink-400">{e.organization}</div>
               {e.emphasis === "primary" ? (
                 <ul className="mt-2 space-y-1">
                   {e.responsibilities.map((r) => (
-                    <li key={r} className="flex gap-2 text-sm text-alu-300">
-                      <span className="text-alu-500" aria-hidden>▸</span>
+                    <li key={r} className="flex gap-2 text-sm text-ink-600">
+                      <span className="text-paper-400" aria-hidden>▸</span>
                       {r}
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="mt-1 text-sm text-alu-400">{e.responsibilities[0]}</p>
+                <p className="mt-1 text-sm text-ink-400">{e.responsibilities[0]}</p>
               )}
             </div>
           ))}
@@ -243,20 +243,20 @@ export function BriefingContent() {
       </div>
 
       <div>
-        <h4 className="tech-label mb-3">Volunteering & community</h4>
+        <h4 className="label mb-3">Volunteering & community</h4>
         <div className="space-y-3">
           {volunteerExperience.map((e) => (
-            <div key={e.title} className="rounded-lg border border-alu-500/20 bg-graphite-800/70 p-4">
-              <div className="font-semibold text-alu-100">{e.title}</div>
-              <div className="text-sm text-alu-400">
+            <div key={e.title} className="rounded-lg border border-paper-400/20 bg-paper-200/70 p-4">
+              <div className="font-semibold text-ink-900">{e.title}</div>
+              <div className="text-sm text-ink-400">
                 {e.organization}
                 {e.location ? ` · ${e.location}` : ""}
               </div>
-              {e.focus && <p className="mt-1 text-sm text-alu-300">{e.focus}</p>}
+              {e.focus && <p className="mt-1 text-sm text-ink-600">{e.focus}</p>}
               <ul className="mt-2 space-y-1">
                 {e.responsibilities.map((r) => (
-                  <li key={r} className="flex gap-2 text-sm text-alu-300">
-                    <span className="text-alu-500" aria-hidden>▸</span>
+                  <li key={r} className="flex gap-2 text-sm text-ink-600">
+                    <span className="text-paper-400" aria-hidden>▸</span>
                     {r}
                   </li>
                 ))}
@@ -267,18 +267,18 @@ export function BriefingContent() {
       </div>
 
       <div>
-        <h4 className="tech-label mb-3">Education</h4>
+        <h4 className="label mb-3">Education</h4>
         <div className="space-y-3">
           {education.map((ed) => (
-            <div key={ed.institution} className="rounded-lg border border-alu-500/20 bg-graphite-800/70 p-4">
-              <div className="font-semibold text-white">{ed.institution}</div>
-              <div className="text-sm text-sky-accent">{ed.credential}</div>
-              <div className="text-xs text-alu-400">
+            <div key={ed.institution} className="rounded-lg border border-paper-400/20 bg-paper-200/70 p-4">
+              <div className="font-semibold text-ink-900">{ed.institution}</div>
+              <div className="text-sm text-signal">{ed.credential}</div>
+              <div className="text-xs text-ink-400">
                 {ed.school} · {ed.location}
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {ed.details.map((d) => (
-                  <span key={d} className="rounded bg-graphite-600/60 px-2 py-0.5 text-xs text-alu-300">
+                  <span key={d} className="rounded bg-paper-300/60 px-2 py-0.5 text-xs text-ink-600">
                     {d}
                   </span>
                 ))}
@@ -290,15 +290,15 @@ export function BriefingContent() {
 
       {siteConfig.confirmed.orientationLeader && (
         <div>
-          <h4 className="tech-label mb-3">Leadership</h4>
+          <h4 className="label mb-3">Leadership</h4>
           {leadership.map((e) => (
-            <div key={e.title} className="rounded-lg border border-alu-500/20 bg-graphite-800/70 p-4">
-              <div className="font-semibold text-alu-100">{e.title}</div>
-              <div className="text-sm text-alu-400">{e.organization}</div>
+            <div key={e.title} className="rounded-lg border border-paper-400/20 bg-paper-200/70 p-4">
+              <div className="font-semibold text-ink-900">{e.title}</div>
+              <div className="text-sm text-ink-400">{e.organization}</div>
               <ul className="mt-2 space-y-1">
                 {e.responsibilities.map((r) => (
-                  <li key={r} className="flex gap-2 text-sm text-alu-300">
-                    <span className="text-alu-500" aria-hidden>▸</span>
+                  <li key={r} className="flex gap-2 text-sm text-ink-600">
+                    <span className="text-paper-400" aria-hidden>▸</span>
                     {r}
                   </li>
                 ))}
@@ -310,10 +310,10 @@ export function BriefingContent() {
 
       {siteConfig.confirmed.certifications && (
         <div>
-          <h4 className="tech-label mb-3">Certifications & training</h4>
+          <h4 className="label mb-3">Certifications & training</h4>
           <div className="flex flex-wrap gap-2">
             {certifications.map((c) => (
-              <span key={c} className="rounded border border-alu-500/30 bg-graphite-800/70 px-2.5 py-1 text-xs text-alu-200">
+              <span key={c} className="rounded border border-paper-400/30 bg-paper-200/70 px-2.5 py-1 text-xs text-ink-800">
                 {c}
               </span>
             ))}
@@ -338,20 +338,20 @@ const ICONS: Record<string, string> = {
 export function SkillsContent() {
   return (
     <div className="space-y-4">
-      <p className="text-sm text-alu-300">
+      <p className="text-sm text-ink-600">
         Skills grouped by system — the tools and methods used across my projects and research.
       </p>
       {skillGroups.map((g) => (
-        <div key={g.id} className="rounded-lg border border-alu-500/20 bg-graphite-800/70 p-4">
+        <div key={g.id} className="rounded-lg border border-paper-400/20 bg-paper-200/70 p-4">
           <div className="mb-3 flex items-center gap-2.5">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--color-sky-accent)" aria-hidden>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--color-signal)" aria-hidden>
               <path d={ICONS[g.icon]} />
             </svg>
-            <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-alu-100">{g.label}</span>
+            <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-ink-900">{g.label}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {g.skills.map((s) => (
-              <span key={s} className="rounded border border-alu-500/25 bg-graphite-900/70 px-2.5 py-1 text-xs text-alu-200">
+              <span key={s} className="skill-tag rounded border border-paper-400/40 bg-paper-300/80 px-2.5 py-1 text-xs text-ink-900">
                 {s}
               </span>
             ))}
@@ -374,14 +374,14 @@ export function ContactContent() {
   ];
   return (
     <div className="space-y-6">
-      <p className="text-sm leading-relaxed text-alu-200">{personal.contactMessages.main}</p>
+      <p className="text-sm leading-relaxed text-ink-800">{personal.contactMessages.main}</p>
       <div className="space-y-2">
         <a
           href={getMailto("Engineering opportunity — via portfolio")}
           className="flex items-center justify-between rounded-lg border border-[#58e07f]/35 bg-[#58e07f]/5 p-4 transition hover:border-[#58e07f]"
         >
           <div>
-            <div className="tech-label mb-0.5" style={{ color: "#58e07f" }}>Email — primary channel</div>
+            <div className="label mb-0.5" style={{ color: "#58e07f" }}>Email — primary channel</div>
             <EmailReveal />
           </div>
           <span aria-hidden className="text-[#58e07f]">▸</span>
@@ -392,26 +392,26 @@ export function ContactContent() {
             href={it.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between rounded-lg border border-alu-500/20 bg-graphite-800/70 p-4 transition hover:border-sky-accent/60"
+            className="flex items-center justify-between rounded-lg border border-paper-400/20 bg-paper-200/70 p-4 transition hover:border-signal/60"
           >
             <div>
-              <div className="tech-label mb-0.5">{it.label}</div>
-              <div className="text-sm text-alu-100">{it.value}</div>
+              <div className="label mb-0.5">{it.label}</div>
+              <div className="text-sm text-ink-900">{it.value}</div>
             </div>
-            <span aria-hidden className="text-alu-500">↗</span>
+            <span aria-hidden className="text-paper-400">↗</span>
           </a>
         ))}
       </div>
-      <div className="rounded-lg border border-alu-500/20 bg-graphite-800/70 p-4">
-        <div className="tech-label mb-2">Resume</div>
+      <div className="rounded-lg border border-paper-400/20 bg-paper-200/70 p-4">
+        <div className="label mb-2">Resume</div>
         <ResumeAction />
       </div>
-      <p className="text-sm text-alu-400">{personal.contactMessages.short}</p>
+      <p className="text-sm text-ink-400">{personal.contactMessages.short}</p>
     </div>
   );
 }
 
 /** Email rendered only client-side from obfuscated parts (anti-scrape). */
 function EmailReveal() {
-  return <div className="text-sm text-alu-100">{getEmail()}</div>;
+  return <div className="text-sm text-ink-900">{getEmail()}</div>;
 }

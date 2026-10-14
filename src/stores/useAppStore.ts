@@ -2,13 +2,15 @@
 
 import { create } from "zustand";
 import type { SectionId } from "@/data/sections";
-import type { Quality } from "@/data/config";
+import type { Tier } from "@/lib/device";
 
 /** Global experience state (3D mode, panels, settings). */
 export type Mode = "landing" | "boarding" | "interior";
+export type TimeOfDay = "morning" | "evening" | "midnight";
 
 interface AppState {
   ready: boolean; // 3D scene has produced its first frame
+  scenePending: boolean;
   mode: Mode;
   /** Section the user is boarding into / nearest to inside the cabin */
   currentSection: SectionId;
@@ -23,7 +25,17 @@ interface AppState {
   settingsOpen: boolean;
   soundOn: boolean;
   reducedMotion: boolean;
-  quality: Quality;
+  /** null until the device has been profiled on first client render */
+  tier: Tier | null;
+  timeOfDay: TimeOfDay;
+  setTimeOfDay: (time: TimeOfDay) => void;
+
+  /** Exploration progress — gives the cabin walk a purpose beyond sightseeing */
+  visitedZones: SectionId[];
+  openedProjects: string[];
+  /** Transient cabin-PA line, shown briefly on the flight strip */
+  announcement: string | null;
+  seatAt: { x: number; z: number } | null;
 
   setReady: () => void;
   board: (section?: SectionId) => void;
@@ -39,12 +51,15 @@ interface AppState {
   toggleSettings: (v?: boolean) => void;
   toggleSound: () => void;
   setReducedMotion: (v: boolean) => void;
-  setQuality: (q: Quality) => void;
+  setTier: (t: Tier) => void;
+  announce: (msg: string | null) => void;
+  setSeatAt: (seat: { x: number; z: number } | null) => void;
 }
 
 /** Dev/testing hook: the store is reachable from the console as __app. */
 export const useAppStore = create<AppState>((set) => ({
   ready: false,
+  scenePending: false,
   mode: "landing",
   currentSection: "cockpit",
   openPanel: null,
@@ -55,27 +70,54 @@ export const useAppStore = create<AppState>((set) => ({
   settingsOpen: false,
   soundOn: false, // audio always starts muted (autoplay + accessibility rules)
   reducedMotion: false,
-  quality: "balanced",
+  tier: null,
+  timeOfDay: "evening",
+  setTimeOfDay: (timeOfDay) => set({ timeOfDay }),
+  visitedZones: [],
+  openedProjects: [],
+  announcement: null,
+  seatAt: null,
 
-  setReady: () => set({ ready: true }),
+  setReady: () => set({ ready: true, scenePending: false }),
   board: (section = "projects") =>
-    set({ mode: "boarding", currentSection: section, mapOpen: false }),
-  enterInterior: () => set({ mode: "interior" }),
+    set({ mode: "boarding", currentSection: section, mapOpen: false, scenePending: true }),
+  // the zone you board into counts as visited — otherwise progress never
+  // registers the first zone, since setCurrentSection only fires on a change
+  enterInterior: () =>
+    set((st) => ({
+      mode: "interior",
+      visitedZones: st.visitedZones.includes(st.currentSection)
+        ? st.visitedZones
+        : [...st.visitedZones, st.currentSection],
+    })),
   exitToExterior: () =>
-    set({ mode: "landing", openPanel: null, openProject: null, mapOpen: false }),
-  setCurrentSection: (s) => set({ currentSection: s }),
+    set({ mode: "landing", openPanel: null, openProject: null, mapOpen: false, seatAt: null }),
+  setCurrentSection: (s) =>
+    set((st) => ({
+      currentSection: s,
+      visitedZones: st.visitedZones.includes(s) ? st.visitedZones : [...st.visitedZones, s],
+    })),
   setPanel: (p) => set({ openPanel: p, openProject: null }),
-  setProject: (id) => set({ openProject: id }),
-  requestJump: (s) => set({ jumpTo: s, mapOpen: false, openPanel: null }),
+  setProject: (id) =>
+    set((st) => ({
+      openProject: id,
+      openedProjects:
+        id && !st.openedProjects.includes(id)
+          ? [...st.openedProjects, id]
+          : st.openedProjects,
+    })),
+  requestJump: (s) => set({ jumpTo: s, mapOpen: false, openPanel: null, seatAt: null }),
   consumeJump: () => set({ jumpTo: null }),
   toggleMap: (v) => set((st) => ({ mapOpen: v ?? !st.mapOpen })),
   toggleHelp: (v) => set((st) => ({ helpOpen: v ?? !st.helpOpen })),
   toggleSettings: (v) => set((st) => ({ settingsOpen: v ?? !st.settingsOpen })),
   toggleSound: () => set((st) => ({ soundOn: !st.soundOn })),
   setReducedMotion: (v) => set({ reducedMotion: v }),
-  setQuality: (q) => set({ quality: q }),
+  setTier: (t) => set({ tier: t }),
+  announce: (msg) => set({ announcement: msg }),
+  setSeatAt: (seat) => set({ seatAt: seat }),
 }));
 
-if (typeof window !== "undefined") {
+if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
   (window as unknown as { __app: typeof useAppStore }).__app = useAppStore;
 }

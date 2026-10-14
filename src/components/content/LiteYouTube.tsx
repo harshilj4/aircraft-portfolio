@@ -10,7 +10,7 @@ export default function LiteYouTube({ id, title }: { id: string; title: string }
   const [playing, setPlaying] = useState(false);
 
   return (
-    <div className="overflow-hidden rounded-lg border border-alu-500/25 bg-black">
+    <div className="overflow-hidden border-[1.5px] border-ink-900 bg-ink-900">
       <div className="relative aspect-video w-full">
         {playing ? (
           <iframe
@@ -35,7 +35,7 @@ export default function LiteYouTube({ id, title }: { id: string; title: string }
               loading="lazy"
             />
             <span className="absolute inset-0 flex items-center justify-center">
-              <span className="flex h-14 w-20 items-center justify-center rounded-xl border border-white/30 bg-black/60 backdrop-blur transition group-hover:bg-navy-700/80 group-hover:border-sky-accent">
+              <span className="flex h-14 w-20 items-center justify-center border-[1.5px] border-paper-100 bg-ink-900/75 transition group-hover:bg-signal">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff" aria-hidden>
                   <path d="M8 5v14l11-7z" />
                 </svg>
@@ -44,13 +44,13 @@ export default function LiteYouTube({ id, title }: { id: string; title: string }
           </button>
         )}
       </div>
-      <div className="flex items-center justify-between px-3 py-2">
-        <span className="tech-label">Project video</span>
+      <div className="flex items-center justify-between bg-paper-100 px-3 py-2">
+        <span className="label">Project video</span>
         <a
           href={`https://youtu.be/${id}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs font-mono uppercase tracking-widest text-sky-accent hover:text-white"
+          className="readout text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-signal hover:underline"
         >
           Watch on YouTube ↗
         </a>

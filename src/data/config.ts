@@ -33,11 +33,10 @@ export const siteConfig = {
     servoMeasurements: false, // turret servo dimensions — confirm before publishing as specs
   },
 
-  /** Default 3D quality: "high" | "balanced" | "performance" (auto-detected too) */
-  defaultQuality: "balanced" as const,
-
   /** Show the sound toggle (all audio is procedurally generated, muted by default) */
   soundEnabled: true,
 };
 
-export type Quality = "high" | "balanced" | "performance";
+// Scene detail is no longer a user-facing "quality" setting — it is a device
+// tier resolved at runtime and adjusted live from the frame rate.
+// See src/lib/device.ts.

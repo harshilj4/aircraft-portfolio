@@ -78,7 +78,7 @@ export const projects: Project[] = [
       "OpenCV computer vision",
       "Arduino IDE",
       "Serial communication",
-      "SolidWorks / Fusion 360 for mechanical design",
+      "SolidWorks for mechanical design",
     ],
     mechanicalWork: [
       "Servo mounting geometry",
@@ -342,3 +342,4 @@ export const projects: Project[] = [
 
 export const featuredProjects = projects.filter((p) => p.featured);
 export const getProject = (id: string) => projects.find((p) => p.id === id);
+

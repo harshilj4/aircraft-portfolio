@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useAppStore } from "@/stores/useAppStore";
 import { useIsTouch } from "@/hooks/useIsMobile";
-import { touchMove, resetTouchMove } from "@/lib/touchControls";
+import { touchMove, touchJump, resetTouchMove } from "@/lib/touchControls";
 
 /** Max knob travel from the stick centre, in px. */
 const TRAVEL = 38;
@@ -17,6 +17,9 @@ const TRAVEL = 38;
 export default function TouchControls() {
   const mode = useAppStore((s) => s.mode);
   const openPanel = useAppStore((s) => s.openPanel);
+  const seatAt = useAppStore((s) => s.seatAt);
+  const mapOpen=useAppStore(s=>s.mapOpen),helpOpen=useAppStore(s=>s.helpOpen),settingsOpen=useAppStore(s=>s.settingsOpen);
+  const blocked=!!openPanel||mapOpen||helpOpen||settingsOpen||!!seatAt;
   const isTouch = useIsTouch();
   const baseRef = useRef<HTMLDivElement>(null);
   const knobRef = useRef<HTMLDivElement>(null);
@@ -24,9 +27,10 @@ export default function TouchControls() {
 
   // let go of the stick whenever the cabin is left or a panel takes over
   useEffect(() => {
-    if (mode !== "interior" || openPanel) release();
-  }, [mode, openPanel]);
+    if (mode !== "interior" || blocked) release();
+  }, [mode, blocked]);
   useEffect(() => () => resetTouchMove(), []);
+  useEffect(()=>{const reset=()=>release();window.addEventListener("blur",reset);document.addEventListener("visibilitychange",reset);return()=>{window.removeEventListener("blur",reset);document.removeEventListener("visibilitychange",reset);};},[]);
 
   function release() {
     pointerId.current = null;
@@ -50,12 +54,14 @@ export default function TouchControls() {
   }
 
   if (!isTouch || mode !== "interior") return null;
+  if (blocked) return null;
 
   return (
+    <>
     <div
       ref={baseRef}
-      className="fixed bottom-6 left-5 z-30 flex h-28 w-28 touch-none select-none items-center justify-center rounded-full border border-alu-500/25 bg-graphite-950/45 backdrop-blur-sm"
-      style={{ bottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
+      className="fixed left-4 z-30 flex h-28 w-28 touch-none select-none items-center justify-center rounded-full border-[1.5px] border-ink-900 bg-paper-100/75"
+      style={{ bottom: "max(4.75rem, calc(env(safe-area-inset-bottom) + 4.25rem))" }}
       role="application"
       aria-label="Movement joystick — drag to walk through the cabin"
       onPointerDown={(e) => {
@@ -74,15 +80,28 @@ export default function TouchControls() {
       onPointerCancel={(e) => {
         if (e.pointerId === pointerId.current) release();
       }}
+      onLostPointerCapture={release}
     >
       {/* travel ring */}
-      <div aria-hidden className="absolute inset-3 rounded-full border border-sky-accent/20" />
+      <div aria-hidden className="absolute inset-3 rounded-full border border-dashed border-ink-400/50" />
       {/* knob */}
       <div
         ref={knobRef}
         aria-hidden
-        className="h-12 w-12 rounded-full border border-sky-accent/50 bg-sky-accent/25 shadow-[0_0_18px_rgba(157,140,255,0.35)]"
+        className="h-12 w-12 rounded-full border-[1.5px] border-ink-900 bg-signal shadow-[2px_2px_0_rgba(20,22,26,0.9)]"
       />
     </div>
+    {!openPanel && (
+      <button
+        type="button"
+        className="btn btn--signal fixed right-4 z-30 h-14 w-14 rounded-full p-0 text-[0.58rem]"
+        style={{ bottom: "max(5.3rem, calc(env(safe-area-inset-bottom) + 4.8rem))" }}
+        onClick={(e) => { e.stopPropagation(); touchJump.requested = true; }}
+        aria-label="Jump"
+      >
+        JUMP
+      </button>
+    )}
+    </>
   );
 }

@@ -1,17 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAppStore } from "@/stores/useAppStore";
 import { useIsTouch } from "@/hooks/useIsMobile";
-import { getSection } from "@/data/sections";
+import { getSection, sections } from "@/data/sections";
 import { personal } from "@/data/personal";
-import { siteConfig, type Quality } from "@/data/config";
+import { siteConfig } from "@/data/config";
+import type { Tier } from "@/lib/device";
 import { startAmbience, stopAmbience, uiClick } from "@/lib/audio";
 import { ResumeAction } from "@/components/content/SectionContents";
 
-/** Minimal flight-deck HUD layered over the 3D scene. */
+/**
+ * HUD built as an air-traffic-control flight strip rather than four floating
+ * corner clusters. One anchored bar owns the controls, so nothing can collide
+ * with anything else — which is what kept breaking on narrow screens.
+ */
 export default function Hud() {
   const mode = useAppStore((s) => s.mode);
   const currentSection = useAppStore((s) => s.currentSection);
@@ -24,21 +29,41 @@ export default function Hud() {
   const toggleSound = useAppStore((s) => s.toggleSound);
   const exitToExterior = useAppStore((s) => s.exitToExterior);
   const setPanel = useAppStore((s) => s.setPanel);
-  const quality = useAppStore((s) => s.quality);
-  const setQuality = useAppStore((s) => s.setQuality);
+  const tier = useAppStore((s) => s.tier);
+  const setTier = useAppStore((s) => s.setTier);
   const reducedMotion = useAppStore((s) => s.reducedMotion);
   const setReducedMotion = useAppStore((s) => s.setReducedMotion);
   const isTouch = useIsTouch();
 
-  const section = getSection(currentSection);
+  const visitedZones = useAppStore((s) => s.visitedZones);
+  const openedProjects = useAppStore((s) => s.openedProjects);
+  const announcement = useAppStore((s) => s.announcement);
+  const announce = useAppStore((s) => s.announce);
+  const seatAt = useAppStore((s) => s.seatAt);
+  const setSeatAt = useAppStore((s) => s.setSeatAt);
 
-  // sound follows the toggle + current environment
+  const section = getSection(currentSection);
+  const idx = sections.findIndex((s) => s.id === currentSection);
+  const explored = visitedZones.length;
+  const progress = (explored / sections.length) * 100;
+  const allSeen = explored >= sections.length;
+
+  // Cabin PA: greet each newly-reached zone once, then clear itself.
+  const lastZone = useRef<string | null>(null);
+  useEffect(() => {
+    if (mode !== "interior") return;
+    if (lastZone.current === currentSection) return;
+    lastZone.current = currentSection;
+    announce(`Now entering ${section.zoneName} — ${section.tagline}`);
+    const t = setTimeout(() => announce(null), 4200);
+    return () => clearTimeout(t);
+  }, [currentSection, mode, section.zoneName, section.tagline, announce]);
+
   useEffect(() => {
     if (soundOn) startAmbience(mode === "interior");
     else stopAmbience();
   }, [soundOn, mode]);
 
-  // Escape closes any open overlay
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
@@ -54,163 +79,236 @@ export default function Hud() {
 
   return (
     <>
-      {/* top-left: identity + current zone. On phones the name is dropped
-          (the hero / zone chip carries identity) so the top bar never wraps
-          into the buttons. */}
+      {/* ══ top bar: identity + primary nav ══ */}
       <div
-        className="pointer-events-none fixed left-4 z-30 select-none"
-        style={{ top: "max(1rem, env(safe-area-inset-top))" }}
-      >
-        <div className="hidden font-mono text-[0.68rem] uppercase tracking-[0.3em] text-alu-400 sm:block">
-          {personal.name}
-        </div>
-        {mode === "interior" && (
-          <div className="mt-0 flex items-center gap-2 sm:mt-1">
-            <span className="beacon inline-block h-1.5 w-1.5 rounded-full bg-amber-av" aria-hidden />
-            <span className="max-w-[38vw] truncate font-mono text-xs uppercase tracking-[0.2em] text-sky-accent sm:max-w-none">
-              {section.zoneName}
-              {/* the tagline needs more width than a phone has next to the buttons */}
-              <span className="hidden md:inline"> — {section.tagline}</span>
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* top-right: primary controls — icon-compact on phones so they sit in
-          one row without colliding with the zone chip */}
-      <div
-        className="fixed right-3 z-30 flex justify-end gap-1.5 sm:right-4 sm:gap-2"
+        className="pointer-events-none fixed inset-x-0 z-30 flex items-start justify-between gap-2 px-3 sm:px-4"
         style={{ top: "max(0.75rem, env(safe-area-inset-top))" }}
       >
-        {mode === "interior" && (
+        <div className="pointer-events-auto slate flex items-center gap-2 px-2.5 py-1.5">
+          <span className="beacon block h-1.5 w-1.5 shrink-0 rounded-full bg-signal" aria-hidden />
+          <span className="readout truncate text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-paper-100">
+            <span className="hidden sm:inline">{personal.name} · </span>HJ&nbsp;001
+          </span>
+        </div>
+
+        <div className="pointer-events-auto flex shrink-0 gap-1.5 sm:gap-2">
+          {mode === "interior" && (
+            <button
+              type="button"
+              className="btn btn--sm btn--ghost"
+              onClick={() => { uiClick(soundOn); exitToExterior(); }}
+              aria-label="Return to exterior view"
+            >
+              ⤴<span className="hidden sm:inline">&nbsp;Exterior</span>
+            </button>
+          )}
           <button
             type="button"
-            className="hud-btn"
-            onClick={() => { uiClick(soundOn); exitToExterior(); }}
-            aria-label="Return to exterior view"
+            className="btn btn--sm btn--ghost"
+            onClick={() => { uiClick(soundOn); toggleMap(); }}
+            aria-label="Open cabin map"
           >
-            ⤴<span className="hidden sm:inline"> Exterior</span>
+            ▦<span className="hidden sm:inline">&nbsp;Map</span>
           </button>
-        )}
-        <button
-          type="button"
-          className="hud-btn"
-          onClick={() => { uiClick(soundOn); toggleMap(); }}
-          aria-label="Open aircraft map"
-        >
-          ▦<span className="hidden sm:inline"> Map</span>
-        </button>
-        <Link href="/recruiter" className="hud-btn hud-btn--amber">
-          ★ Recruiter<span className="hidden sm:inline"> Mode</span>
-        </Link>
-      </div>
-
-      {/* bottom-right: utility controls */}
-      <div className="fixed bottom-4 right-4 z-30 flex gap-2" style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}>
-        <button
-          type="button"
-          className="hud-btn"
-          onClick={toggleSound}
-          aria-pressed={soundOn}
-          aria-label={soundOn ? "Mute ambient sound" : "Enable ambient sound"}
-        >
-          {soundOn ? "♪ On" : "♪ Off"}
-        </button>
-        <button type="button" className="hud-btn" onClick={() => toggleSettings()} aria-label="Graphics and accessibility settings">
-          ⚙
-        </button>
-        <button type="button" className="hud-btn" onClick={() => toggleHelp()} aria-label="Help and controls">
-          ?
-        </button>
-      </div>
-
-      {/* bottom-left: quick shortcuts (inside the cabin only — the landing
-          overlay already provides these on the exterior view; on touch
-          devices the joystick owns this corner, and Contact stays reachable
-          via the map + comms zone) */}
-      {mode === "interior" && !isTouch && (
-        <div className="fixed bottom-4 left-4 z-30 hidden gap-2 sm:flex">
-          <button type="button" className="hud-btn" onClick={() => setPanel("comms")}>
-            ✉ Contact
-          </button>
-          <ResumeAction />
+          <Link href="/recruiter" className="btn btn--sm btn--signal">
+            ★&nbsp;Recruiter
+          </Link>
         </div>
-      )}
+      </div>
 
-      {/* help modal */}
+      {/* ══ cabin PA announcement ══ */}
       <AnimatePresence>
-        {helpOpen && (
-          <Modal title="Controls & Help" onClose={() => toggleHelp(false)}>
-            <div className="space-y-4 text-sm text-alu-200">
-              <div>
-                <div className="tech-label mb-2">Exterior</div>
-                <ul className="space-y-1">
-                  {isTouch ? (
-                    <li>▸ Tap a glowing window (or “Board Aircraft”) to enter the cabin there.</li>
-                  ) : (
-                    <>
-                      <li>▸ Hover the fuselage — glowing windows mark portfolio sections.</li>
-                      <li>▸ Click a window (or “Board Aircraft”) to enter the cabin there.</li>
-                    </>
-                  )}
-                </ul>
-              </div>
-              <div>
-                <div className="tech-label mb-2">Inside the cabin</div>
-                <ul className="space-y-1">
-                  {isTouch ? (
-                    <>
-                      <li>▸ <b>Left joystick</b> — walk</li>
-                      <li>▸ <b>Drag anywhere else</b> — look around</li>
-                      <li>▸ <b>Tap an exhibit</b> — open its display</li>
-                      <li>▸ <b>Map</b> — jump between zones instantly</li>
-                    </>
-                  ) : (
-                    <>
-                      <li>▸ <b>W A S D</b> or arrow keys — walk</li>
-                      <li>▸ <b>Click + drag</b> — look around</li>
-                      <li>▸ <b>Click an exhibit</b> — open its display</li>
-                      <li>▸ <b>Map</b> — jump between zones instantly</li>
-                      <li>▸ <b>Esc</b> — close panels</li>
-                    </>
-                  )}
-                </ul>
-              </div>
-              <p className="text-alu-400">
-                Prefer a conventional website? <Link className="text-amber-av underline" href="/recruiter">Recruiter Mode</Link> has
-                everything on one fast page.
-              </p>
+        {mode === "interior" && announcement && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.28 }}
+            className="pointer-events-none fixed inset-x-0 z-30 flex justify-center px-3"
+            style={{ bottom: "calc(max(0.75rem, env(safe-area-inset-bottom)) + 4.2rem)" }}
+          >
+            <div className="slate flex max-w-[92vw] items-center gap-2 px-3 py-1.5">
+              <span aria-hidden className="text-signal">✦</span>
+              <span className="readout truncate text-[0.62rem] uppercase tracking-[0.14em] text-paper-100">
+                {announcement}
+              </span>
             </div>
-          </Modal>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      {/* settings modal */}
+      {/* ══ bottom flight strip (cabin only) ══ */}
+      {mode === "interior" && (
+        <div
+          className="pointer-events-none fixed inset-x-0 z-30 px-3 sm:px-4"
+          style={{ bottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+        >
+          <div
+            className={`pointer-events-auto paper mx-auto flex max-w-3xl items-stretch overflow-hidden ${
+              isTouch ? "ml-auto mr-0 w-fit sm:mx-auto" : ""
+            }`}
+          >
+            {/* zone readout */}
+            <button type="button" onClick={()=>setPanel(currentSection)} aria-label={`Read ${section.name}`} className="flex min-w-0 items-center gap-2.5 px-3 py-2 text-left hover:bg-paper-200">
+              <span className="index-num text-base leading-none">
+                {String(idx + 1).padStart(2, "0")}
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-[0.82rem] font-bold leading-tight text-ink-900">
+                  {section.zoneName}
+                </span>
+                <span className="label block truncate text-[0.5rem]">{section.name}</span>
+              </span>
+            </button>
+
+            {/* exploration progress — desktop */}
+            <div className="hidden flex-1 flex-col justify-center border-l-[1.5px] border-ink-900 px-3 md:flex">
+              <div className="flex items-baseline justify-between">
+                <span className="label text-[0.5rem]">
+                  {allSeen ? "Cabin fully explored" : "Cabin explored"}
+                </span>
+                <span className="readout text-[0.58rem] font-bold text-ink-900">
+                  {explored}/{sections.length} zones
+                  {openedProjects.length > 0 && ` · ${openedProjects.length} exhibits`}
+                </span>
+              </div>
+              <div className="relative mt-1 h-1.5 w-full bg-paper-300">
+                <div
+                  className={`absolute inset-y-0 left-0 transition-all duration-500 ${
+                    allSeen ? "bg-runway" : "bg-signal"
+                  }`}
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+
+            {/* utilities */}
+            <div className="flex items-center gap-1 border-l-[1.5px] border-ink-900 px-2">
+              {seatAt && <button type="button" className="btn btn--sm" onClick={() => setSeatAt(null)}>Stand</button>}
+              {!isTouch && (
+                <button type="button" className="btn btn--sm" onClick={() => setPanel("comms")}>
+                  ✉<span className="hidden lg:inline">&nbsp;Contact</span>
+                </button>
+              )}
+              <button
+                type="button"
+                className="btn btn--sm"
+                onClick={toggleSound}
+                aria-pressed={soundOn}
+                aria-label={soundOn ? "Mute ambient sound" : "Enable ambient sound"}
+              >
+                {soundOn ? "♪" : "♪̸"}
+              </button>
+              <button type="button" className="btn btn--sm" onClick={() => toggleSettings()} aria-label="Settings">
+                ⚙
+              </button>
+              <button type="button" className="btn btn--sm" onClick={() => toggleHelp()} aria-label="Help and controls">
+                ?
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══ exterior utilities ══
+          Stacked against the right edge on phones (the boarding pass owns the
+          bottom of the screen there) and tucked bottom-right on desktop. */}
+      {/* phones: stacked under the flight-number chip, clear of the diagonal
+          airframe and the boarding pass. desktop: tucked bottom-right. */}
+      {mode !== "interior" && (
+        <div className="pointer-events-auto fixed left-3 top-20 z-30 flex flex-col gap-1.5 sm:bottom-4 sm:left-auto sm:right-3 sm:top-auto sm:flex-row">
+          <button
+            type="button"
+            className="btn btn--sm btn--ghost"
+            onClick={toggleSound}
+            aria-pressed={soundOn}
+            aria-label={soundOn ? "Mute ambient sound" : "Enable ambient sound"}
+          >
+            {soundOn ? "♪" : "♪̸"}
+          </button>
+          <button type="button" className="btn btn--sm btn--ghost" onClick={() => toggleSettings()} aria-label="Settings">
+            ⚙
+          </button>
+          <button type="button" className="btn btn--sm btn--ghost" onClick={() => toggleHelp()} aria-label="Help and controls">
+            ?
+          </button>
+        </div>
+      )}
+
+      {/* ══ help ══ */}
+      <AnimatePresence>
+        {helpOpen && (
+          <Sheet title="Controls" index="—" onClose={() => toggleHelp(false)}>
+            <div className="space-y-5 text-[0.88rem] text-ink-600">
+              <p className="text-xs leading-relaxed">Aircraft: Ryan Miller and FlightGear CRJ700 contributors, CC BY 4.0; converted exterior with simulator components removed. Interior chair, walnut and skies: Poly Haven, CC0. <a href="https://github.com/FGMEMBERS-NONGPL/CRJ700-family" target="_blank" rel="noreferrer" className="underline text-signal">Aircraft source and credits</a></p>
+              <Block label="Exterior">
+                <li>Hit <b className="text-ink-900">Board</b> on the pass, or click the aircraft.</li>
+                <li>Use the <b className="text-ink-900">cabin manifest</b> or <b className="text-ink-900">Map</b> to enter at a chosen zone.</li>
+              </Block>
+              <Block label="Inside the cabin">
+                {isTouch ? (
+                  <>
+                    <li><b className="text-ink-900">Left stick</b> — walk</li>
+                    <li><b className="text-ink-900">Jump</b> — hop in the aisle</li>
+                    <li><b className="text-ink-900">Tap a seat</b> — sit; tap Stand up to leave</li>
+                    <li><b className="text-ink-900">Drag elsewhere</b> — look around</li>
+                    <li><b className="text-ink-900">Tap an exhibit</b> — open it</li>
+                    <li><b className="text-ink-900">Map</b> — jump between zones</li>
+                  </>
+                ) : (
+                  <>
+                    <li><b className="text-ink-900">W A S D</b> / arrows — walk</li>
+                    <li><b className="text-ink-900">Space</b> — jump</li>
+                    <li><b className="text-ink-900">Click a seat</b> — sit; press E to stand</li>
+                    <li><b className="text-ink-900">Click + drag</b> — look around</li>
+                    <li><b className="text-ink-900">Click an exhibit</b> — open it</li>
+                    <li><b className="text-ink-900">Map</b> — jump between zones</li>
+                    <li><b className="text-ink-900">Esc</b> — close panels</li>
+                  </>
+                )}
+              </Block>
+              <p className="border-t-[1.5px] border-ink-900 pt-3 text-[0.8rem]">
+                Prefer a plain page?{" "}
+                <Link className="font-semibold text-signal underline" href="/recruiter">
+                  Recruiter Mode
+                </Link>{" "}
+                has everything in one fast scroll.
+              </p>
+            </div>
+          </Sheet>
+        )}
+      </AnimatePresence>
+
+      {/* ══ settings ══ */}
       <AnimatePresence>
         {settingsOpen && (
-          <Modal title="Settings" onClose={() => toggleSettings(false)}>
+          <Sheet title="Settings" index="—" onClose={() => toggleSettings(false)}>
             <div className="space-y-5">
               <div>
-                <div className="tech-label mb-2">Graphics quality</div>
-                <div className="flex gap-2">
-                  {(["high", "balanced", "performance"] as Quality[]).map((q) => (
+                <div className="label mb-2">Detail level</div>
+                <div className="flex gap-1.5">
+                  {(["high", "mid", "low"] as Tier[]).map((t) => (
                     <button
-                      key={q}
+                      key={t}
                       type="button"
-                      onClick={() => setQuality(q)}
-                      className={`hud-btn ${quality === q ? "hud-btn--primary" : ""}`}
-                      aria-pressed={quality === q}
+                      onClick={() => setTier(t)}
+                      className={`btn btn--sm flex-1 ${tier === t ? "btn--signal" : ""}`}
+                      aria-pressed={tier === t}
                     >
-                      {q}
+                      {t}
                     </button>
                   ))}
                 </div>
+                <p className="mt-2 text-[0.75rem] leading-snug text-ink-400">
+                  Set automatically from your device, and lowered on its own if the
+                  frame rate drops. Pick <b>low</b> to force the lightest scene.
+                </p>
               </div>
               <div>
-                <div className="tech-label mb-2">Motion</div>
+                <div className="label mb-2">Motion</div>
                 <button
                   type="button"
-                  className={`hud-btn ${reducedMotion ? "hud-btn--primary" : ""}`}
+                  className={`btn btn--sm ${reducedMotion ? "btn--signal" : ""}`}
                   onClick={() => setReducedMotion(!reducedMotion)}
                   aria-pressed={reducedMotion}
                 >
@@ -218,28 +316,49 @@ export default function Hud() {
                 </button>
               </div>
               <div>
-                <div className="tech-label mb-2">Sound</div>
-                <button type="button" className={`hud-btn ${soundOn ? "hud-btn--primary" : ""}`} onClick={toggleSound} aria-pressed={soundOn}>
-                  {soundOn ? "Ambient sound: on" : "Ambient sound: off"}
+                <div className="label mb-2">Sound</div>
+                <button
+                  type="button"
+                  className={`btn btn--sm ${soundOn ? "btn--signal" : ""}`}
+                  onClick={toggleSound}
+                  aria-pressed={soundOn}
+                >
+                  {soundOn ? "Ambient: on" : "Ambient: off"}
                 </button>
                 {siteConfig.soundEnabled && (
-                  <p className="mt-2 text-xs text-alu-500">All audio is subtle, procedural and always optional.</p>
+                  <p className="mt-2 text-[0.75rem] text-ink-400">
+                    All audio is procedural and always optional.
+                  </p>
                 )}
               </div>
+              <div className="border-t-[1.5px] border-ink-900 pt-4">
+                <ResumeAction />
+              </div>
             </div>
-          </Modal>
+          </Sheet>
         )}
       </AnimatePresence>
     </>
   );
 }
 
-function Modal({
+function Block({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="label mb-1.5">{label}</div>
+      <ul className="space-y-1 [&>li]:flex [&>li]:gap-2">{children}</ul>
+    </div>
+  );
+}
+
+export function Sheet({
   title,
+  index,
   onClose,
   children,
 }: {
   title: string;
+  index: string;
   onClose: () => void;
   children: React.ReactNode;
 }) {
@@ -248,26 +367,29 @@ function Modal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/45 p-4"
       onClick={onClose}
       role="dialog"
       aria-label={title}
     >
       <motion.div
-        initial={{ scale: 0.94, y: 10 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.94, y: 10 }}
-        className="glass-panel w-full max-w-md rounded-xl p-6"
+        initial={{ y: 14, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 14, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="paper w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-4 flex items-center">
-          <h2 className="text-lg font-bold text-white">{title}</h2>
-          <button type="button" className="hud-btn ml-auto" onClick={onClose}>
+        <div className="flex items-center gap-3 border-b-[1.5px] border-ink-900 px-4 py-3">
+          <span className="index-num text-sm">{index}</span>
+          <h2 className="display text-xl text-ink-900">{title}</h2>
+          <button type="button" className="btn btn--sm ml-auto" onClick={onClose} aria-label="Close">
             ✕
           </button>
         </div>
-        {children}
+        <div className="max-h-[70vh] overflow-y-auto px-4 py-4">{children}</div>
       </motion.div>
     </motion.div>
   );
 }
+

@@ -10,8 +10,8 @@ import { links } from "@/data/links";
 const Experience = dynamic(() => import("@/components/Experience"), {
   ssr: false,
   loading: () => (
-    <div className="fixed inset-0 flex items-center justify-center bg-graphite-950">
-      <div className="font-mono text-xs uppercase tracking-[0.3em] text-alu-400">
+    <div className="fixed inset-0 flex items-center justify-center bg-paper-100">
+      <div className="readout text-xs uppercase tracking-[0.3em] text-ink-400">
         Preparing aircraft…
       </div>
     </div>

@@ -7,11 +7,11 @@ function Field({ label, items }: { label: string; items?: string[] }) {
   if (!items || items.length === 0) return null;
   return (
     <div>
-      <h4 className="tech-label mb-2">{label}</h4>
+      <h4 className="label mb-2">{label}</h4>
       <ul className="grid gap-1.5 sm:grid-cols-2">
         {items.map((it) => (
-          <li key={it} className="flex gap-2 text-sm text-alu-200">
-            <span className="mt-0.5 text-sky-accent" aria-hidden>▸</span>
+          <li key={it} className="flex gap-2 text-sm text-ink-800">
+            <span className="mt-0.5 text-signal" aria-hidden>▸</span>
             {it}
           </li>
         ))}
@@ -33,18 +33,18 @@ export default function ProjectDetail({ project }: { project: Project }) {
             {project.status}
           </span>
           {project.category.map((c) => (
-            <span key={c} className="rounded border border-alu-500/30 px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-widest text-alu-400">
+            <span key={c} className="rounded border border-paper-400/30 px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-widest text-ink-400">
               {c}
             </span>
           ))}
         </div>
-        <h3 className="text-xl font-bold text-white">{project.title}</h3>
+        <h3 className="text-xl font-bold text-ink-900">{project.title}</h3>
         {project.informalName && (
-          <p className="mt-1 text-xs text-alu-400">
+          <p className="mt-1 text-xs text-ink-400">
             Informal project label: “{project.informalName}”
           </p>
         )}
-        <p className="mt-2 text-sm leading-relaxed text-alu-300">{project.summary}</p>
+        <p className="mt-2 text-sm leading-relaxed text-ink-600">{project.summary}</p>
       </header>
 
       {project.youtubeId && <LiteYouTube id={project.youtubeId} title={project.title} />}
@@ -53,21 +53,21 @@ export default function ProjectDetail({ project }: { project: Project }) {
         <div className="grid grid-cols-2 gap-2">
           {project.images.map((img) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={img.src} src={img.src} alt={img.alt} className="w-full rounded-lg border border-alu-500/20" loading="lazy" />
+            <img key={img.src} src={img.src} alt={img.alt} className="w-full rounded-lg border border-paper-400/20" loading="lazy" />
           ))}
         </div>
       )}
 
-      <div className="space-y-3 text-sm leading-relaxed text-alu-200">
+      <div className="space-y-3 text-sm leading-relaxed text-ink-800">
         {project.description.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
       </div>
 
       {project.goal && (
-        <div className="rounded-lg border border-sky-dim/40 bg-navy-900/60 p-4">
-          <h4 className="tech-label mb-1">Mission objective</h4>
-          <p className="text-sm text-alu-100">{project.goal}</p>
+        <div className="rounded-lg border border-signal/40 bg-paper-200/60 p-4">
+          <h4 className="label mb-1">Mission objective</h4>
+          <p className="text-sm text-ink-900">{project.goal}</p>
         </div>
       )}
 
@@ -79,8 +79,8 @@ export default function ProjectDetail({ project }: { project: Project }) {
         <Field label="Engineering challenges" items={project.challenges} />
         {project.outcome && (
           <div>
-            <h4 className="tech-label mb-1">Outcome</h4>
-            <p className="text-sm text-alu-200">{project.outcome}</p>
+            <h4 className="label mb-1">Outcome</h4>
+            <p className="text-sm text-ink-800">{project.outcome}</p>
           </div>
         )}
         <Field label="Skills demonstrated" items={project.skills} />

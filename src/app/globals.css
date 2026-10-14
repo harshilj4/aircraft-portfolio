@@ -1,157 +1,263 @@
 @import "tailwindcss";
 
-@theme {
-  /* Storm palette — graphite-indigo, deep violet, aluminium, electric periwinkle, aviation amber */
-  --color-graphite-950: #07060e;
-  --color-graphite-900: #0c0a18;
-  --color-graphite-800: #131024;
-  --color-graphite-700: #1b1732;
-  --color-graphite-600: #262043;
-  --color-navy-900: #120f2a;
-  --color-navy-800: #1a1548;
-  --color-navy-700: #2a2166;
-  --color-alu-100: #eef1f7;
-  --color-alu-200: #d5d9e6;
-  --color-alu-300: #adb3c8;
-  --color-alu-400: #8890a8;
-  --color-alu-500: #5f667f;
-  --color-sky-accent: #9d8cff;
-  --color-sky-dim: #5b4fa8;
-  --color-amber-av: #ffb454;
-  --color-red-av: #ff5f57;
+/* ─────────────────────────────────────────────────────────────────────────────
+   DAYBREAK — high-altitude dawn.
+   Visual language: aviation technical documentation. Warm paper stock, hard
+   ink rules, tabular data, signal orange. Deliberately NOT dark-glass UI:
+   panels are opaque paper with crisp borders and offset hard shadows, the way
+   a printed flight manual or a boarding pass sits on a desk.
+   ───────────────────────────────────────────────────────────────────────────── */
 
-  --font-mono-tech: "Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+@theme {
+  /* paper stock */
+  --color-paper-50: #fdfbf6;
+  --color-paper-100: #f6f1e6;
+  --color-paper-200: #ece5d5;
+  --color-paper-300: #ddd3bd;
+  --color-paper-400: #c3b79c;
+
+  /* ink */
+  --color-ink-900: #14161a;
+  --color-ink-800: #23272e;
+  --color-ink-600: #4c535d;
+  --color-ink-400: #7c848f;
+  --color-ink-300: #9aa1ab;
+
+  /* signal + aviation */
+  --color-signal: #e2571f;
+  --color-signal-deep: #b83f12;
+  --color-navy: #10395e;
+  --color-navy-700: #1b5081;
+  --color-sky-pale: #bcd7ea;
+  --color-runway: #1f7a55;
+  --color-caution: #e0a02a;
+
+  --font-mono-tech: "Cascadia Code", "JetBrains Mono", Consolas, "SF Mono", monospace;
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html,
 body {
   height: 100%;
-  background: var(--color-graphite-950);
-  color: var(--color-alu-100);
-  font-family: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif;
+  background: var(--color-ink-900);
+  color: var(--color-ink-900);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: rgba(157, 140, 255, 0.35);
+  background: var(--color-signal);
+  color: #fff;
 }
 
-/* Thin technical scrollbars */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #2a3444 transparent;
-}
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-*::-webkit-scrollbar-thumb {
-  background: #2a3444;
-  border-radius: 4px;
+/* The 3D canvas owns its gestures. Without this the browser keeps trying to
+   pan/zoom the page during a drag, competing with the look control — which is
+   what made turning feel choppy and made drags cut out mid-swipe on phones. */
+canvas {
+  touch-action: none;
 }
 
-/* Utility: brushed-glass panel used across the HUD and content panels */
-.glass-panel {
-  background: linear-gradient(165deg, rgba(22, 18, 42, 0.92), rgba(10, 8, 20, 0.94));
-  border: 1px solid rgba(165, 155, 225, 0.16);
-  box-shadow:
-    0 18px 60px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(14px);
+/* ── typography ─────────────────────────────────────────────────────────── */
+
+/* Editorial display type — heavy, tight, no-nonsense */
+.display {
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  font-feature-settings: "ss01", "cv01";
 }
 
-.tech-label {
+/* Small caps technical label — the workhorse of the whole UI */
+.label {
   font-family: var(--font-mono-tech);
-  font-size: 0.66rem;
-  letter-spacing: 0.22em;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--color-alu-400);
+  color: var(--color-ink-400);
 }
 
-.hud-btn {
+/* Tabular data readout */
+.readout {
+  font-family: var(--font-mono-tech);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+/* Section index number, e.g. "03" */
+.index-num {
+  font-family: var(--font-mono-tech);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-signal);
+}
+
+/* ── surfaces ───────────────────────────────────────────────────────────── */
+
+/* Opaque paper card with a hard offset shadow — the signature surface */
+.paper {
+  background: var(--color-paper-100);
+  border: 1.5px solid var(--color-ink-900);
+  box-shadow: 4px 4px 0 rgba(20, 22, 26, 0.9);
+}
+.paper-flat {
+  background: var(--color-paper-100);
+  border: 1.5px solid var(--color-ink-900);
+}
+.paper-inset {
+  background: var(--color-paper-200);
+  border: 1px solid var(--color-paper-400);
+}
+
+/* Dark counterpart for readouts that need to punch against bright sky */
+.slate {
+  background: var(--color-ink-900);
+  border: 1.5px solid var(--color-ink-900);
+  color: var(--color-paper-100);
+  box-shadow: 4px 4px 0 rgba(20, 22, 26, 0.35);
+}
+
+/* Perforated edge, like a torn boarding-pass stub */
+.perf-edge {
+  background-image: radial-gradient(
+    circle at 3px 50%,
+    transparent 0 3px,
+    var(--color-ink-900) 3px 3.6px,
+    transparent 3.6px
+  );
+  background-size: 100% 11px;
+  background-repeat: repeat-y;
+}
+
+/* ── controls ───────────────────────────────────────────────────────────── */
+
+.btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.9rem;
-  border-radius: 0.375rem;
-  border: 1px solid rgba(165, 155, 225, 0.22);
-  background: rgba(15, 12, 28, 0.78);
-  color: var(--color-alu-200);
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1rem;
+  min-height: 2.6rem;
+  border: 1.5px solid var(--color-ink-900);
+  background: var(--color-paper-100);
+  color: var(--color-ink-900);
   font-family: var(--font-mono-tech);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s, background 0.2s, box-shadow 0.2s;
-  backdrop-filter: blur(10px);
+  box-shadow: 3px 3px 0 var(--color-ink-900);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
-.hud-btn:hover,
-.hud-btn:focus-visible {
-  border-color: var(--color-sky-accent);
-  color: #fff;
-  box-shadow: 0 0 18px rgba(157, 140, 255, 0.3);
+.btn:hover,
+.btn:focus-visible {
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 1.5px 1.5px 0 var(--color-ink-900);
   outline: none;
 }
-.hud-btn--primary {
-  border-color: rgba(157, 140, 255, 0.55);
-  background: rgba(42, 33, 102, 0.75);
-  color: #efeaff;
+.btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--color-ink-900);
 }
-.hud-btn--amber {
-  border-color: rgba(255, 180, 84, 0.5);
-  color: var(--color-amber-av);
+.btn--signal {
+  background: var(--color-signal);
+  color: #fff;
+  border-color: var(--color-ink-900);
 }
-.hud-btn--amber:hover,
-.hud-btn--amber:focus-visible {
-  border-color: var(--color-amber-av);
-  box-shadow: 0 0 18px rgba(255, 180, 84, 0.25);
-  color: #ffd9a0;
+.btn--navy {
+  background: var(--color-navy);
+  color: var(--color-paper-50);
+}
+.btn--ghost {
+  background: rgba(246, 241, 230, 0.92);
+  backdrop-filter: blur(2px);
+}
+.btn--sm {
+  padding: 0.4rem 0.65rem;
+  min-height: 2.25rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  box-shadow: 2px 2px 0 var(--color-ink-900);
+}
+.btn--sm:hover,
+.btn--sm:focus-visible {
+  box-shadow: 1px 1px 0 var(--color-ink-900);
 }
 
-/* Compact HUD controls on phone widths — one tidy row, still ≥40px tall
-   for comfortable tapping */
-@media (max-width: 640px) {
-  .hud-btn {
-    padding: 0.5rem 0.68rem;
-    font-size: 0.66rem;
-    letter-spacing: 0.09em;
-    gap: 0.3rem;
-  }
+/* Hazard stripe rule — used as a section divider */
+.hazard {
+  height: 6px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-ink-900) 0 7px,
+    var(--color-caution) 7px 14px
+  );
+}
+
+/* Thin ink rule */
+.rule {
+  height: 1.5px;
+  background: var(--color-ink-900);
+}
+
+/* ── scrollbars ─────────────────────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-400) transparent;
+}
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-ink-400);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-600);
+  background-clip: content-box;
+}
+
+/* ── motion ─────────────────────────────────────────────────────────────── */
+
+@keyframes beacon {
+  0%, 88%, 100% { opacity: 0.2; }
+  90%, 96% { opacity: 1; }
+}
+.beacon {
+  animation: beacon 2.6s infinite;
+}
+
+@keyframes sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(400%); }
 }
 
 /* Focus visibility for keyboard users */
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid var(--color-sky-accent);
+  outline: 2.5px solid var(--color-signal);
   outline-offset: 2px;
 }
 
-/* Blinking aviation beacon */
-@keyframes beacon {
-  0%, 92%, 100% { opacity: 0.25; }
-  94%, 98% { opacity: 1; }
-}
-.beacon {
-  animation: beacon 2.4s infinite;
-}
-
-/* Slow cloud drift for the mobile / fallback sky */
-@keyframes drift {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-/* Distant lightning flash for the mobile storm hero */
-@keyframes mflash {
-  0%, 91%, 100% { opacity: 0; }
-  92% { opacity: 0.55; }
-  93.5% { opacity: 0.1; }
-  95% { opacity: 0.7; }
-  97% { opacity: 0; }
+/* Phones: tighten the controls but keep every target ≥ 40px tall */
+@media (max-width: 640px) {
+  .btn {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.64rem;
+    letter-spacing: 0.07em;
+    gap: 0.3rem;
+  }
+  .paper,
+  .slate {
+    box-shadow: 3px 3px 0 rgba(20, 22, 26, 0.85);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -162,4 +268,49 @@ button:focus-visible {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Flight lighting affects the reading surfaces, while body type stays familiar. */
+:root { --color-ink-400: #626c78; }
+.display { line-height: 1; letter-spacing: -.035em; }
+.label { letter-spacing: .14em; }
+.btn--ghost { background: var(--color-paper-100); backdrop-filter: none; }
+.paper .text-paper-400 { color: var(--color-ink-600); }
+.flight-experience[data-time-of-day="evening"] .paper,
+.flight-experience[data-time-of-day="evening"] .paper-flat {
+  --color-paper-100: #f4eadb;
+  --color-paper-200: #e9dcc8;
+  --color-paper-300: #dcc9ae;
+  --color-paper-400: #b6a180;
+}
+.flight-experience[data-time-of-day="evening"] .display {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  letter-spacing: -.045em;
+}
+.flight-experience[data-time-of-day="midnight"] .paper,
+.flight-experience[data-time-of-day="midnight"] .paper-flat {
+  --color-paper-50: #101820;
+  --color-paper-100: #17232e;
+  --color-paper-200: #202f3c;
+  --color-paper-300: #354959;
+  --color-paper-400: #647b8c;
+  --color-ink-900: #f2eee5;
+  --color-ink-800: #e1e5e8;
+  --color-ink-600: #c4ced6;
+  --color-ink-400: #aebbc7;
+  --color-ink-300: #92a5b4;
+  --color-signal: #ffad6a;
+  --color-signal-deep: #ffc28f;
+  color: var(--color-ink-900);
+  border-color: #647b8c;
+  box-shadow: 3px 3px 0 #060c13;
+  color-scheme: dark;
+}
+.flight-experience[data-time-of-day="midnight"] .paper .btn--signal {
+  background: #cb5b26; color: white;
+}
+.flight-experience[data-time-of-day="midnight"] .paper .btn--navy { color: #f5eee4; }
+@media (max-width: 640px) {
+  .btn, .btn--sm { min-height: 44px; }
 }

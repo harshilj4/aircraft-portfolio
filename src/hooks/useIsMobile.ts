@@ -13,10 +13,12 @@ export function useIsTouch(): boolean {
 
   useEffect(() => {
     const mq = window.matchMedia("(pointer: coarse)");
-    const check = () => setIsTouch(mq.matches);
+    const small = window.matchMedia("(max-width: 640px)");
+    const check = () => setIsTouch(mq.matches || small.matches);
     check();
     mq.addEventListener("change", check);
-    return () => mq.removeEventListener("change", check);
+    small.addEventListener("change", check);
+    return () => { mq.removeEventListener("change", check); small.removeEventListener("change", check); };
   }, []);
 
   return isTouch;

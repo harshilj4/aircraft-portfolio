@@ -7,16 +7,16 @@ import { useAppStore } from "@/stores/useAppStore";
 import { personal } from "@/data/personal";
 
 /**
- * Aerospace pre-flight loading screen. Reflects REAL readiness: it clears as
- * soon as the 3D scene has rendered its first frame (plus a very short
- * checklist beat) — no artificial multi-second boot sequence.
+ * Pre-flight checklist. Reflects REAL readiness — it clears the moment the 3D
+ * scene has rendered its first frame, with only a short checklist beat, never
+ * an invented multi-second boot sequence.
  */
 const CHECKLIST = [
-  "AIRCRAFT SYSTEMS ................ INIT",
-  "FLIGHT ENVIRONMENT .............. OK",
-  "PROJECT DATABASE ................ LOADED",
-  "NAVIGATION ...................... ONLINE",
-];
+  ["AIRFRAME", "INIT"],
+  ["ENVIRONMENT", "OK"],
+  ["PROJECT DATABASE", "LOADED"],
+  ["NAVIGATION", "ONLINE"],
+] as const;
 
 export default function LoadingGate() {
   const ready = useAppStore((s) => s.ready);
@@ -24,8 +24,8 @@ export default function LoadingGate() {
   const [line, setLine] = useState(0);
 
   useEffect(() => {
-    const t = setTimeout(() => setMinElapsed(true), 900);
-    const i = setInterval(() => setLine((l) => Math.min(l + 1, CHECKLIST.length)), 220);
+    const t = setTimeout(() => setMinElapsed(true), 250);
+    const i = setInterval(() => setLine((l) => Math.min(l + 1, CHECKLIST.length)), 75);
     return () => {
       clearTimeout(t);
       clearInterval(i);
@@ -38,38 +38,56 @@ export default function LoadingGate() {
     <AnimatePresence>
       {!done && (
         <motion.div
-          exit={{ opacity: 0, transition: { duration: 0.5 } }}
-          className="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-graphite-950"
+          exit={{ opacity: 0, transition: { duration: 0.45 } }}
+          className="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-paper-100 px-6"
           aria-label="Loading"
         >
-          <div className="mb-8 text-center">
-            <div className="font-mono text-xs uppercase tracking-[0.4em] text-alu-400">
-              {personal.name}
+          <div className="w-full max-w-sm">
+            <div className="mb-5">
+              <div className="label">Pre-flight</div>
+              <div className="display mt-0.5 text-3xl text-ink-900">{personal.name}</div>
+              <div className="readout mt-1 text-[0.62rem] uppercase tracking-[0.2em] text-ink-400">
+                Interactive aerospace portfolio
+              </div>
             </div>
-            <div className="mt-1 font-mono text-[0.65rem] uppercase tracking-[0.3em] text-alu-500">
-              Interactive aerospace portfolio
+
+            <div className="hazard" />
+
+            <div className="readout mt-4 space-y-1.5 text-[0.7rem]">
+              {CHECKLIST.slice(0, line).map(([k, v]) => (
+                <motion.div
+                  key={k}
+                  initial={{ opacity: 0, x: -6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-center gap-2"
+                >
+                  <span className="text-ink-600">{k}</span>
+                  <span className="h-px flex-1 bg-paper-400" />
+                  <span className="font-bold text-runway">{v}</span>
+                </motion.div>
+              ))}
+              {!ready && line >= CHECKLIST.length && (
+                <div className="flex items-center gap-2 text-ink-400">
+                  <span>RENDERING FIRST FRAME</span>
+                  <span className="h-px flex-1 bg-paper-400" />
+                  <span className="text-caution">···</span>
+                </div>
+              )}
             </div>
+
+            <div className="mt-5 h-2 border-[1.5px] border-ink-900 bg-paper-200">
+              <motion.div
+                className="h-full bg-signal"
+                initial={{ width: "6%" }}
+                animate={{ width: ready ? "100%" : "68%" }}
+                transition={{ duration: ready ? 0.3 : 1.1 }}
+              />
+            </div>
+
+            <Link href="/recruiter" className="btn btn--sm mt-6 w-full">
+              Skip — open Recruiter Mode ▸
+            </Link>
           </div>
-          <div className="w-72 font-mono text-[0.7rem] leading-7 text-sky-accent/90">
-            {CHECKLIST.slice(0, line).map((c) => (
-              <div key={c}>{c}</div>
-            ))}
-            {!ready && line >= CHECKLIST.length && <div className="text-alu-400">RENDERING FIRST FRAME…</div>}
-          </div>
-          <div className="mt-8 h-0.5 w-72 overflow-hidden rounded bg-graphite-700">
-            <motion.div
-              className="h-full bg-sky-accent"
-              initial={{ width: "5%" }}
-              animate={{ width: ready ? "100%" : "70%" }}
-              transition={{ duration: ready ? 0.3 : 1.2 }}
-            />
-          </div>
-          <Link
-            href="/recruiter"
-            className="mt-10 font-mono text-[0.7rem] uppercase tracking-[0.25em] text-amber-av underline-offset-4 hover:underline"
-          >
-            Skip — open Recruiter Mode ▸
-          </Link>
         </motion.div>
       )}
     </AnimatePresence>

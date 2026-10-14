@@ -17,7 +17,6 @@ export const skillGroups: SkillGroup[] = [
     icon: "cad",
     skills: [
       "SolidWorks",
-      "Fusion 360",
       "AutoCAD",
       "Part & assembly modelling",
       "Engineering drawings & dimensioning",
@@ -74,7 +73,6 @@ export const skillGroups: SkillGroup[] = [
     icon: "tools",
     skills: [
       "SolidWorks",
-      "Fusion 360",
       "AutoCAD",
       "MATLAB",
       "Python",
@@ -100,3 +98,4 @@ export const skillGroups: SkillGroup[] = [
     ],
   },
 ];
+

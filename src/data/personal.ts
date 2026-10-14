@@ -6,15 +6,15 @@
 export const personal = {
   name: "Harshil Jadawala",
   location: "Brampton, Ontario, Canada",
-  role: "Mechanical Engineering Student",
+  role: "Mechanical Engineering",
   university: "York University",
   school: "Lassonde School of Engineering",
   program: "Bachelor of Engineering in Mechanical Engineering",
 
   headline:
-    "Mechanical Engineering Student Focused on Aerospace Design, Prototyping and Engineering Research",
-  headlineShort: "Mechanical Engineering Student | Aerospace, CAD and Prototyping",
-  headlineTiny: "Mechanical Engineering Student",
+    "Mechanical Engineering | Aerospace Design, Prototyping and Engineering Research",
+  headlineShort: "Mechanical Engineering | Aerospace, CAD and Prototyping",
+  headlineTiny: "Mechanical Engineering",
 
   supportingLine:
     "Designing, building and testing engineering systems with a focus on aerospace, mechanical design and research.",
@@ -78,3 +78,4 @@ export const personal = {
       "I am currently building experience in mechanical design, aerospace projects, prototyping and engineering research. I welcome opportunities to contribute, learn and develop within an engineering team.",
   },
 };
+

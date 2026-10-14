@@ -10,6 +10,16 @@ import * as THREE from "three";
  * over UI panels and scales perfectly with the geometry.
  */
 
+/**
+ * Touch devices render these screens small and pay real costs for them:
+ * anisotropic filtering is expensive on tile GPUs, and full-size canvases eat
+ * texture bandwidth. Halving the canvas quarters the memory per screen, which
+ * matters when the cabin carries ~50 of them.
+ */
+const COARSE =
+  typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+const TEX_SCALE = COARSE ? 0.6 : 1;
+
 export function useCanvasTexture(
   draw: (ctx: CanvasRenderingContext2D, w: number, h: number) => void,
   w = 512,
@@ -17,14 +27,19 @@ export function useCanvasTexture(
   deps: unknown[] = []
 ): THREE.CanvasTexture {
   return useMemo(() => {
+    // draw at the authored size, then let the GPU scale — the draw code can
+    // keep using plain pixel coordinates
+    const cw = Math.max(64, Math.round(w * TEX_SCALE));
+    const ch = Math.max(64, Math.round(h * TEX_SCALE));
     const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
+    canvas.width = cw;
+    canvas.height = ch;
     const ctx = canvas.getContext("2d")!;
+    ctx.scale(TEX_SCALE, TEX_SCALE);
     draw(ctx, w, h);
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
-    tex.anisotropy = 4;
+    tex.anisotropy = COARSE ? 1 : 4;
     return tex;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
@@ -72,7 +87,7 @@ export function screenBase(
   h: number,
   accent: string
 ) {
-  ctx.fillStyle = "#070a12";
+  ctx.fillStyle = "#0e1620";
   ctx.fillRect(0, 0, w, h);
   const grad = ctx.createLinearGradient(0, 0, 0, h);
   grad.addColorStop(0, "rgba(255,255,255,0.05)");
@@ -121,18 +136,26 @@ export function drawZoneSign(
   h: number,
   opts: { zone: string; tagline: string; accent: string }
 ) {
-  ctx.fillStyle = "#0b0918";
+  // Backlit cabin placard: warm paper face, ink type, accent rules — matches
+  // the printed-manual language the rest of the UI uses.
+  ctx.fillStyle = "#f6f1e6";
   ctx.fillRect(0, 0, w, h);
   ctx.fillStyle = opts.accent;
-  ctx.fillRect(0, 0, w, 6);
-  ctx.fillRect(0, h - 6, w, 6);
+  ctx.fillRect(0, 0, w, 7);
+  ctx.fillRect(0, h - 7, w, 7);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#eef1f7";
-  ctx.font = "700 44px 'Segoe UI', sans-serif";
-  ctx.fillText(opts.zone.toUpperCase(), w / 2, h / 2 - 16);
-  ctx.fillStyle = opts.accent;
-  ctx.font = "500 20px Consolas, monospace";
-  ctx.fillText(opts.tagline.toUpperCase(), w / 2, h / 2 + 30);
+  ctx.fillStyle = "#14161a";
+  const zone = opts.zone.toUpperCase();
+  let titleSize = 44;
+  ctx.font = `800 ${titleSize}px 'Segoe UI', sans-serif`;
+  while (ctx.measureText(zone).width > w - 56 && titleSize > 20) {
+    ctx.font = `800 ${--titleSize}px 'Segoe UI', sans-serif`;
+  }
+  ctx.fillText(zone, w / 2, h / 2 - 15);
+  ctx.fillStyle = "#4c535d";
+  ctx.font = "600 19px Consolas, monospace";
+  ctx.fillText(opts.tagline.toUpperCase(), w / 2, h / 2 + 30, w - 56);
   ctx.textAlign = "left";
 }
+

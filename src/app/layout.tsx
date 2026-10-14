@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#07090d",
+  themeColor: "#f6f1e6",
   width: "device-width",
   initialScale: 1,
   // lets the 3D scene and HUD extend into notch/home-indicator areas,
@@ -38,7 +38,7 @@ export default function RootLayout({
     <html lang="en">
       {/* touch-manipulation removes the 300ms double-tap-zoom delay on HUD
           buttons without disabling pinch-zoom for accessibility */}
-      <body className="min-h-screen touch-manipulation bg-graphite-950 text-alu-100 antialiased">
+      <body className="min-h-screen touch-manipulation bg-paper-100 text-ink-900 antialiased">
         {children}
       </body>
     </html>

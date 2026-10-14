@@ -10,9 +10,13 @@ export const touchMove = {
   right: 0,
 };
 
+/** One-shot jump input, consumed by the cabin rig on its next frame. */
+export const touchJump = { requested: false };
+
 export function resetTouchMove() {
   touchMove.forward = 0;
   touchMove.right = 0;
+  touchJump.requested = false;
 }
 
 // dev/testing hook, mirroring the __app store handle

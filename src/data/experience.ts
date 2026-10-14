@@ -33,6 +33,22 @@ export const researchExperience: ExperienceEntry[] = [
 
 export const workExperience: ExperienceEntry[] = [
   {
+    // Title/employer confirmed by Harshil. General role duties requested by
+    // Harshil and aligned with Brampton's published Location Supervisor role.
+    // Dates and quantified achievements have not been supplied.
+    title: "Location Supervisor",
+    organization: "City of Brampton — Municipal Elections",
+    location: "Brampton, Ontario",
+    responsibilities: [
+      "Coordinate voting-location setup, supplies and closing procedures",
+      "Support election staff and organize tasks to keep voting operations running smoothly",
+      "Manage voter flow and respond to general questions with a calm, professional approach",
+      "Communicate staffing, equipment and operational issues to the Ward Manager or Election Office",
+      "Follow election procedures and support the secure handling of ballots, documents and equipment",
+    ],
+    emphasis: "primary",
+  },
+  {
     title: "Concessions Attendant",
     organization: "City of Brampton — Gore Meadows Community Centre",
     location: "Brampton, Ontario",
