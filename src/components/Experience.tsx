@@ -122,7 +122,8 @@ export default function Experience() {
 
   useEffect(() => {
     if (!useAppStore.getState().tier) setTier(getProfile().tier);
-    useAppStore.getState().setTimeOfDay(Math.random() < 0.5 ? "morning" : "evening");
+    const conditions = ["morning", "evening", "midnight"] as const;
+    useAppStore.getState().setTimeOfDay(conditions[Math.floor(Math.random() * conditions.length)]);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setReducedMotion(true);
     }

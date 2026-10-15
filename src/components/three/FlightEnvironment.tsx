@@ -82,19 +82,26 @@ function AtmosphereBackdrop({night}:{night:boolean}) {
           vec3 cloudShade=mix(vec3(.004,.007,.013),vec3(.018,.027,.043),pow(alignment,7.));
           c=mix(c,cloudShade,cloud*.55);
         }else{
-          vec3 lower=vec3(.025,.045,.085),horizon=vec3(.72,.225,.065),upper=vec3(.025,.035,.12);
-          c=mix(lower,horizon,smoothstep(-.55,-.04,h));
-          c=mix(c,upper,smoothstep(.015,.5,h));
+          // A narrow amber horizon between blue hour above and a cool cloud sea.
+          vec3 lower=vec3(.025,.035,.075),horizon=vec3(.85,.27,.075),upper=vec3(.025,.045,.14);
+          c=mix(lower,horizon,smoothstep(-.38,-.08,h));
+          c=mix(c,upper,smoothstep(-.045,.25,h));
           float sun=max(0.,dot(d,normalize(vec3(.5,-.32,-1.))));
-          c+=vec3(.3,.12,.035)*pow(sun,32.);
-          vec3 cloudColor=mix(vec3(.065,.065,.12),vec3(.8,.39,.17),pow(sun,7.));
-          float edge=clamp((farCloud-nearCloud)*3.,0.,1.)*pow(sun,10.);
-          cloudColor+=vec3(.22,.11,.035)*edge;
-          c=mix(c,cloudColor,cloud*.88);
-          c=mix(c,vec3(1.,.79,.43),smoothstep(.9990,.9995,sun)*(1.-cloud*.82));
+          float glow=pow(sun,32.);
+          c+=vec3(.34,.125,.035)*glow;
+          float density=smoothstep(.035,.72,cloud);
+          vec3 cloudColor=mix(vec3(.07,.055,.105),vec3(.68,.27,.11),pow(sun,7.));
+          float edge=clamp((farCloud-nearCloud)*4.,0.,1.)*pow(sun,10.);
+          cloudColor+=vec3(.38,.21,.075)*edge;
+          c=mix(c,cloudColor,density*.92);
+          // The thinner distant layer catches the last light below the aircraft.
+          float veil=farCloud*(1.-smoothstep(-.32,.1,h));
+          c=mix(c,vec3(.18,.12,.16)+vec3(.28,.095,.025)*glow,veil*.25);
+          c=mix(c,vec3(1.,.83,.51),smoothstep(.99935,.99965,sun)*(1.-density*.9));
         }
         gl_FragColor=vec4(c,1.);
         #include <colorspace_fragment>
       }`}/>
   </mesh>;
 }
+
