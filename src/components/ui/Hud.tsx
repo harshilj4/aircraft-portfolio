@@ -126,7 +126,7 @@ export default function Hud() {
             transition={{ duration: 0.28 }}
             className="pointer-events-none fixed inset-x-0 z-30 flex justify-center px-3"
             style={isTouch
-              ? { top: "calc(max(0.75rem, env(safe-area-inset-top)) + 3.5rem)" }
+              ? { top: "calc(max(0.75rem, env(safe-area-inset-top)) + 7rem)" }
               : { bottom: "calc(max(0.75rem, env(safe-area-inset-bottom)) + 4.2rem)" }}
           >
             <div className="slate flex max-w-[92vw] items-center gap-2 px-3 py-1.5">
