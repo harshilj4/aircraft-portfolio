@@ -34,13 +34,13 @@ export default function LandingOverlay() {
             className="pointer-events-auto absolute bottom-0 left-0 w-full sm:bottom-8 sm:left-8 sm:w-[min(30rem,46vw)]"
             style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
           >
-            <div className="paper sm:rounded-none">
+            <div className="paper boarding-card">
               {/* stub header */}
-              <div className="flex items-stretch border-b-[1.5px] border-ink-900">
-                <div className="flex items-center gap-2 bg-ink-900 px-3 py-2">
-                  <span className="beacon block h-1.5 w-1.5 rounded-full bg-signal" aria-hidden />
-                  <span className="readout text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-paper-100">
-                    Boarding Pass
+              <div className="flex items-stretch border-b border-paper-300">
+                <div className="flex items-center gap-2 px-5 py-3">
+                  <span className="block h-1 w-1 rounded-full bg-signal" aria-hidden />
+                  <span className="readout text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-ink-600">
+                    Engineering portfolio
                   </span>
                 </div>
                 <div className="readout ml-auto flex items-center px-3 text-[0.6rem] uppercase tracking-[0.18em] text-ink-400">
@@ -48,24 +48,23 @@ export default function LandingOverlay() {
                 </div>
               </div>
 
-              <div className="px-4 pb-3 pt-2.5 sm:px-5 sm:pb-5 sm:pt-3.5">
-                <div className="label mb-1">Passenger</div>
-                <h1 className="display text-[1.75rem] leading-[0.9] text-ink-900 sm:text-[2.9rem]">
+              <div className="px-5 pb-5 pt-4 sm:p-6">
+                <h1 className="display text-[2rem] leading-[1.02] text-ink-900 sm:text-[2.9rem]">
                   {personal.name.split(" ")[0]}
-                  <br />
+                  <br className="hidden sm:block" /><span className="sm:hidden"> </span>
                   {personal.name.split(" ").slice(1).join(" ")}
                 </h1>
 
                 {/* flight-strip data row */}
-                <div className="mt-3 grid grid-cols-3 gap-px border-[1.5px] border-ink-900 bg-ink-900 sm:mt-4">
+                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 sm:mt-4">
                   {[
-                    ["Field", "Mech Eng"],
+                    ["Field", "Mechanical Eng."],
                     ["Heading", "Aerospace"],
                     ["Based", "Brampton ON"],
                   ].map(([k, v]) => (
-                    <div key={k} className="bg-paper-100 px-2 py-1">
+                    <div key={k}>
                       <div className="label text-[0.48rem] tracking-[0.12em]">{k}</div>
-                      <div className="readout mt-0.5 text-[0.62rem] font-semibold text-ink-900">
+                      <div className="mt-0.5 text-[0.72rem] font-medium text-ink-900">
                         {v}
                       </div>
                     </div>
@@ -78,10 +77,10 @@ export default function LandingOverlay() {
 
                 <div className="mt-3 flex flex-wrap gap-2 sm:mt-4">
                   <button type="button" onClick={() => board("projects")} className="btn btn--signal flex-1 sm:flex-none">
-                    ✈ Board
+                    Explore the cabin <span aria-hidden>↗</span>
                   </button>
                   <Link href="/recruiter" className="btn btn--navy flex-1 sm:flex-none">
-                    ★ Recruiter
+                    View portfolio
                   </Link>
                   <div className="hidden sm:block">
                     <ResumeAction />
@@ -89,7 +88,7 @@ export default function LandingOverlay() {
                 </div>
               </div>
 
-              <div className="hazard" />
+              <div className="flight-rule" />
             </div>
           </motion.div>
 
@@ -102,7 +101,7 @@ export default function LandingOverlay() {
             <div className="slate w-60">
               <div className="border-b border-paper-400/25 px-3 py-2">
                 <span className="readout text-[0.58rem] uppercase tracking-[0.2em] text-paper-300">
-                  Cabin Manifest
+                  Inside the cabin
                 </span>
               </div>
               <ul>

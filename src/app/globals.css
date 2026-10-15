@@ -24,8 +24,8 @@
   --color-ink-300: #9aa1ab;
 
   /* signal + aviation */
-  --color-signal: #e2571f;
-  --color-signal-deep: #b83f12;
+  --color-signal: #a74e26;
+  --color-signal-deep: #823b1c;
   --color-navy: #10395e;
   --color-navy-700: #1b5081;
   --color-sky-pale: #bcd7ea;
@@ -74,7 +74,7 @@ canvas {
 /* Small caps technical label — the workhorse of the whole UI */
 .label {
   font-family: var(--font-mono-tech);
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -101,12 +101,12 @@ canvas {
 /* Opaque paper card with a hard offset shadow — the signature surface */
 .paper {
   background: var(--color-paper-100);
-  border: 1.5px solid var(--color-ink-900);
-  box-shadow: 4px 4px 0 rgba(20, 22, 26, 0.9);
+  border: 1px solid var(--color-paper-400);
+  box-shadow: 0 8px 28px rgba(12, 20, 28, 0.12);
 }
 .paper-flat {
   background: var(--color-paper-100);
-  border: 1.5px solid var(--color-ink-900);
+  border: 1px solid var(--color-paper-400);
 }
 .paper-inset {
   background: var(--color-paper-200);
@@ -116,9 +116,9 @@ canvas {
 /* Dark counterpart for readouts that need to punch against bright sky */
 .slate {
   background: var(--color-ink-900);
-  border: 1.5px solid var(--color-ink-900);
+  border: 1px solid #343b42;
   color: var(--color-paper-100);
-  box-shadow: 4px 4px 0 rgba(20, 22, 26, 0.35);
+  box-shadow: none;
 }
 
 /* Perforated edge, like a torn boarding-pass stub */
@@ -142,36 +142,37 @@ canvas {
   gap: 0.45rem;
   padding: 0.6rem 1rem;
   min-height: 2.6rem;
-  border: 1.5px solid var(--color-ink-900);
+  border: 1px solid var(--color-paper-400);
+  border-radius: 3px;
   background: var(--color-paper-100);
   color: var(--color-ink-900);
-  font-family: var(--font-mono-tech);
-  font-size: 0.7rem;
+  font-family: inherit;
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  text-transform: none;
   cursor: pointer;
-  box-shadow: 3px 3px 0 var(--color-ink-900);
+  box-shadow: none;
   transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 .btn:hover,
 .btn:focus-visible {
-  transform: translate(1.5px, 1.5px);
-  box-shadow: 1.5px 1.5px 0 var(--color-ink-900);
-  outline: none;
+  transform: translateY(-1px);
+  box-shadow: none;
 }
 .btn:active {
-  transform: translate(3px, 3px);
-  box-shadow: 0 0 0 var(--color-ink-900);
+  transform: translateY(0);
+  box-shadow: none;
 }
 .btn--signal {
   background: var(--color-signal);
   color: #fff;
-  border-color: var(--color-ink-900);
+  border-color: var(--color-signal);
 }
 .btn--navy {
   background: var(--color-navy);
   color: var(--color-paper-50);
+  border-color: var(--color-navy);
 }
 .btn--ghost {
   background: rgba(246, 241, 230, 0.92);
@@ -180,24 +181,26 @@ canvas {
 .btn--sm {
   padding: 0.4rem 0.65rem;
   min-height: 2.25rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
-  box-shadow: 2px 2px 0 var(--color-ink-900);
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+  box-shadow: none;
 }
 .btn--sm:hover,
 .btn--sm:focus-visible {
-  box-shadow: 1px 1px 0 var(--color-ink-900);
+  box-shadow: none;
 }
 
 /* Hazard stripe rule — used as a section divider */
 .hazard {
-  height: 6px;
-  background: repeating-linear-gradient(
-    -45deg,
-    var(--color-ink-900) 0 7px,
-    var(--color-caution) 7px 14px
-  );
+  height: 2px;
+  background: var(--color-paper-400);
 }
+.flight-rule { height: 2px; background: #b99c6b; }
+.boarding-card { overflow: hidden; }
+.recruiter-nav { position: sticky; top: 0; z-index: 10; background: var(--color-paper-100); border-bottom: 1px solid var(--color-paper-300); }
+.recruiter-nav a { padding: 14px 0; white-space: nowrap; font-size: .8rem; color: var(--color-ink-600); }
+.recruiter-nav a:hover { color: var(--color-signal); }
+.recruiter-page section { scroll-margin-top: 5rem; }
 
 /* Thin ink rule */
 .rule {
@@ -250,13 +253,13 @@ button:focus-visible {
 @media (max-width: 640px) {
   .btn {
     padding: 0.5rem 0.7rem;
-    font-size: 0.64rem;
-    letter-spacing: 0.07em;
+    font-size: 0.75rem;
+    letter-spacing: 0.01em;
     gap: 0.3rem;
   }
   .paper,
   .slate {
-    box-shadow: 3px 3px 0 rgba(20, 22, 26, 0.85);
+    box-shadow: none;
   }
 }
 
@@ -304,7 +307,7 @@ button:focus-visible {
   --color-signal-deep: #ffc28f;
   color: var(--color-ink-900);
   border-color: #647b8c;
-  box-shadow: 3px 3px 0 #060c13;
+  box-shadow: 0 8px 28px #060c1329;
   color-scheme: dark;
 }
 .flight-experience[data-time-of-day="midnight"] .paper .btn--signal {
@@ -314,3 +317,4 @@ button:focus-visible {
 @media (max-width: 640px) {
   .btn, .btn--sm { min-height: 44px; }
 }
+

@@ -111,7 +111,7 @@ export default function Hud() {
             ▦<span className="hidden sm:inline">&nbsp;Map</span>
           </button>
           <Link href="/recruiter" className="btn btn--sm btn--signal">
-            ★&nbsp;Recruiter
+            Recruiter
           </Link>
         </div>
       </div>

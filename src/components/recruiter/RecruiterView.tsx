@@ -25,7 +25,7 @@ export default function RecruiterView() {
   const open = projects.find((p) => p.id === openId);
 
   return (
-    <div className="min-h-screen bg-paper-100">
+    <div className="recruiter-page min-h-screen bg-paper-100">
       {/* boarding-pass style header */}
       <header className="border-b border-ink-900 bg-gradient-to-b from-paper-200 to-paper-100">
         <div className="mx-auto flex max-w-4xl flex-col gap-4 px-5 py-8 sm:flex-row sm:items-center">
@@ -60,16 +60,22 @@ export default function RecruiterView() {
         </div>
       </header>
 
+      <nav aria-label="Portfolio sections" className="recruiter-nav">
+        <div className="mx-auto flex max-w-4xl gap-6 overflow-x-auto px-5">
+          <a href="#about">About</a><a href="#projects">Projects</a><a href="#skills">Skills</a><a href="#experience">Experience</a><a href="#contact">Contact</a>
+        </div>
+      </nav>
+
       <main className="mx-auto max-w-4xl space-y-12 px-5 py-10">
         {/* about */}
-        <section aria-labelledby="about-h">
+        <section id="about" aria-labelledby="about-h">
           <h2 id="about-h" className="label mb-3">About</h2>
           <p className="max-w-3xl text-sm leading-relaxed text-ink-800">{personal.aboutShort}</p>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-ink-400">{personal.careerGoal}</p>
         </section>
 
         {/* featured projects */}
-        <section aria-labelledby="projects-h">
+        <section id="projects" aria-labelledby="projects-h">
           <h2 id="projects-h" className="label mb-4">Featured Projects & Research</h2>
           {open ? (
             <div className="rounded-xl border border-paper-400/20 bg-paper-200 p-5">
@@ -92,19 +98,19 @@ export default function RecruiterView() {
         </section>
 
         {/* skills */}
-        <section aria-labelledby="skills-h">
+        <section id="skills" aria-labelledby="skills-h">
           <h2 id="skills-h" className="label mb-4">Technical Skills</h2>
           <SkillsContent />
         </section>
 
         {/* experience / education / resume */}
-        <section aria-labelledby="exp-h">
+        <section id="experience" aria-labelledby="exp-h">
           <h2 id="exp-h" className="label mb-4">Experience & Education</h2>
           <BriefingContent />
         </section>
 
         {/* contact */}
-        <section aria-labelledby="contact-h" className="rounded-xl border border-signal/30 bg-paper-200/50 p-6">
+        <section id="contact" aria-labelledby="contact-h" className="rounded-xl border border-signal/30 bg-paper-200/50 p-6">
           <h2 id="contact-h" className="label mb-2">Contact</h2>
           <p className="max-w-2xl text-sm leading-relaxed text-ink-800">
             {personal.contactMessages.recruiter}
@@ -124,7 +130,7 @@ export default function RecruiterView() {
         </section>
       </main>
 
-      <footer className="border-t border-paper-400/10 py-6 text-center font-mono text-[0.65rem] uppercase tracking-[0.25em] text-paper-400">
+      <footer className="border-t border-paper-300 px-5 py-6 text-center text-xs leading-relaxed text-ink-600">
         {personal.name} · {personal.headlineTiny} · Built as an explorable aircraft —{" "}
         <Link href="/" className="text-signal hover:underline">
           board the 3D experience ✈

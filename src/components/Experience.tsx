@@ -57,13 +57,38 @@ function RenderStats() {
  * Demand rendering also sleeps completely in a hidden browser tab. */
 function RenderBudget({ profile }: { profile: PerfProfile }) {
   const { size, setDpr, invalidate } = useThree();
+  const mode = useAppStore(s => s.mode);
+  const reading = useAppStore(s => Boolean(s.openPanel || s.mapOpen || s.helpOpen || s.settingsOpen));
+  const quality = useRef({ dpr: 1.5, ceiling: 2, elapsed: 0, frames: 0, slow: 0, stable: 0, grace: 4 });
   useEffect(() => {
-    const pixels = profile.touch ? 1_150_000 : 4_500_000;
-    setDpr(Math.max(0.65, Math.min(profile.dpr[1], Math.sqrt(pixels / Math.max(1, size.width * size.height)))));
+    const pixels = profile.touch ? 1_800_000 : 4_500_000;
+    const ceiling = Math.max(0.65, Math.min(profile.dpr[1], Math.sqrt(pixels / Math.max(1, size.width * size.height))));
+    const dpr = profile.touch ? Math.min(1.5, ceiling) : ceiling;
+    quality.current = { dpr, ceiling, elapsed: 0, frames: 0, slow: 0, stable: 0, grace: 4 };
+    setDpr(dpr);
   }, [profile.touch, profile.dpr[1], size.width, size.height, setDpr]);
   useEffect(() => {
+    Object.assign(quality.current, { elapsed: 0, frames: 0, slow: 0, stable: 0, grace: 3 });
+  }, [mode, reading]);
+  useFrame((_, dt) => {
+    if (!profile.touch || reading || document.hidden || mode === "boarding" || useAppStore.getState().scenePending) return;
+    const q = quality.current;
+    if (dt > .25) { q.grace = 2; return; }
+    if (q.grace > 0) { q.grace -= dt; return; }
+    q.elapsed += dt; q.frames++; if (dt > .023) q.slow++;
+    if (q.elapsed < 2) return;
+    const missed = q.slow / q.frames;
+    let next = q.dpr;
+    if (missed > .12) { next = Math.max(.75, q.dpr - .15); q.stable = 0; }
+    else if (missed < .025 && ++q.stable >= 3) { next = Math.min(q.ceiling, q.dpr + .1); q.stable = 0; }
+    else if (missed >= .025) q.stable = 0;
+    q.elapsed = 0; q.frames = 0; q.slow = 0;
+    if (Math.abs(next - q.dpr) > .01) { q.dpr = next; setDpr(next); q.grace = 1; }
+  });
+  useEffect(() => {
     let id = 0, last = 0;
-    const interval = profile.touch ? 1000 / 60 : 0;
+    // A reading panel needs little background motion; spare GPU time for scrolling.
+    const interval = reading ? 1000 / 30 : profile.touch ? 1000 / 60 : 0;
     const frame = (now: number) => {
       if (document.hidden) { last = 0; id = requestAnimationFrame(frame); return; }
       const elapsed = now - last;
@@ -75,7 +100,7 @@ function RenderBudget({ profile }: { profile: PerfProfile }) {
     };
     id = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(id);
-  }, [profile.touch, invalidate]);
+  }, [profile.touch, reading, invalidate]);
   return null;
 }
 
@@ -106,6 +131,8 @@ export default function Experience() {
 
   /** Sustained-low-FPS safety net: at most two automatic steps down. */
   const onDecline = () => {
+    const state = useAppStore.getState();
+    if (profile.touch || state.openPanel || state.mapOpen || state.helpOpen || state.settingsOpen) return;
     if (autoDrops.current >= 2) return;
     const next = demote(useAppStore.getState().tier ?? "mid");
     if (next) {

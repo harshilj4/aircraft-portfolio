@@ -39,7 +39,7 @@ function detectTier(touch: boolean): Tier {
     // Safari clamps hardwareConcurrency and never reports deviceMemory, so a
     // phone that looks weak here usually is not — start mid and let the live
     // FPS monitor demote if the frame time actually says so.
-    return cores >= 6 ? "mid" : "low";
+    return mem <= 2 ? "low" : "mid";
   }
   if (cores >= 8 && mem >= 8) return "high";
   if (cores <= 4 || mem <= 4) return "low";
@@ -55,7 +55,7 @@ export function getProfile(forceTier?: Tier): PerfProfile {
   if (tier === "low") {
     return {
       tier, touch,
-      dpr: [0.75, Math.min(touch ? 1.1 : 1.25, deviceDpr)],
+      dpr: [0.75, Math.min(touch ? 1.5 : 1.25, deviceDpr)],
       antialias: false,
       cloudBanks: 4,
       seaLayers: 2,
@@ -67,9 +67,8 @@ export function getProfile(forceTier?: Tier): PerfProfile {
   if (tier === "mid") {
     return {
       tier, touch,
-      // 1.5 is the sweet spot on phones: visibly crisp, a third of the
-      // fragment cost of native 3x.
-      dpr: [0.85, Math.min(touch ? 1.4 : 1.75, deviceDpr)],
+      // Start at 1.5x on phones; measured frame times control recovery to 2x.
+      dpr: [0.85, Math.min(touch ? 2 : 1.75, deviceDpr)],
       antialias: true,
       cloudBanks: 9,
       seaLayers: 3,
