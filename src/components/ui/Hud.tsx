@@ -125,7 +125,9 @@ export default function Hud() {
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.28 }}
             className="pointer-events-none fixed inset-x-0 z-30 flex justify-center px-3"
-            style={{ bottom: "calc(max(0.75rem, env(safe-area-inset-bottom)) + 4.2rem)" }}
+            style={isTouch
+              ? { top: "calc(max(0.75rem, env(safe-area-inset-top)) + 3.5rem)" }
+              : { bottom: "calc(max(0.75rem, env(safe-area-inset-bottom)) + 4.2rem)" }}
           >
             <div className="slate flex max-w-[92vw] items-center gap-2 px-3 py-1.5">
               <span aria-hidden className="text-signal">✦</span>

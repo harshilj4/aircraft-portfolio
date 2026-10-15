@@ -94,9 +94,18 @@ export default function TouchControls() {
     {!openPanel && (
       <button
         type="button"
-        className="btn btn--signal fixed right-4 z-30 h-14 w-14 rounded-full p-0 text-[0.58rem]"
+        className="btn btn--signal fixed right-4 z-30 h-14 w-14 touch-none select-none rounded-full p-0 text-[0.58rem]"
         style={{ bottom: "max(5.3rem, calc(env(safe-area-inset-bottom) + 4.8rem))" }}
-        onClick={(e) => { e.stopPropagation(); touchJump.requested = true; }}
+        onPointerDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          touchJump.requested = true;
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          // Keyboard and assistive activation have no preceding pointer event.
+          if (e.detail === 0) touchJump.requested = true;
+        }}
         aria-label="Jump"
       >
         JUMP
