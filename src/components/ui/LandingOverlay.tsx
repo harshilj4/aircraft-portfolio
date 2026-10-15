@@ -31,7 +31,7 @@ export default function LandingOverlay() {
           <motion.div
             initial={{ y: 26, opacity: 0 }}
             animate={{ y: 0, opacity: 1, transition: { duration: 0.6, delay: 0.35 } }}
-            className="pointer-events-auto absolute bottom-0 left-0 w-full sm:bottom-8 sm:left-8 sm:w-[min(30rem,46vw)]"
+            className="pointer-events-auto absolute bottom-0 left-0 w-full sm:bottom-6 sm:left-6 sm:w-[min(26rem,42vw)]"
             style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
           >
             <div className="paper boarding-card">
@@ -48,8 +48,8 @@ export default function LandingOverlay() {
                 </div>
               </div>
 
-              <div className="px-5 pb-5 pt-4 sm:p-6">
-                <h1 className="display text-[2rem] leading-[1.02] text-ink-900 sm:text-[2.9rem]">
+              <div className="px-5 pb-5 pt-4 sm:p-5">
+                <h1 className="display text-[2rem] leading-[1.02] text-ink-900 sm:text-[2.6rem]">
                   {personal.name.split(" ")[0]}
                   <br className="hidden sm:block" /><span className="sm:hidden"> </span>
                   {personal.name.split(" ").slice(1).join(" ")}

@@ -81,7 +81,9 @@ export default function Aircraft({profile}:{profile:PerfProfile}) {
     </mesh>)}
     <mesh position={[25,5.7,0]}><sphereGeometry args={[.12,8,6]}/><meshBasicMaterial ref={nav} toneMapped={false}/></mesh>
     {profile.contrails&&time!=="midnight"&&[-1,1].map(s=><mesh key={s} position={[44,.6,s*3.75]} rotation={[0,0,Math.PI/2]}>
-      <cylinderGeometry args={[.08,.65,46,6,1,true]}/><meshBasicMaterial color="#d7e6ef" transparent opacity={.10} depthWrite={false} side={THREE.DoubleSide}/>
+      <cylinderGeometry args={[.08,.65,46,6,1,true]}/><shaderMaterial transparent depthWrite={false} side={THREE.DoubleSide}
+        vertexShader={`varying vec2 vTrail; void main(){vTrail=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`}
+        fragmentShader={`varying vec2 vTrail; void main(){float fade=smoothstep(0.,.18,vTrail.y)*(1.-smoothstep(.4,1.,vTrail.y));gl_FragColor=vec4(.78,.84,.9,fade*.07);}`}/>
     </mesh>)}
   </group>;
 }
